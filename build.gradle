@@ -1,0 +1,29 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id 'java'
+    id 'application'
+}
+
+group 'me.mateus'
+version '1.1-SNAPSHOT'
+
+mainClassName = 'me.mateus.milkshake.MilkshakeSimulator'
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+}
+
+dependencies {
+    implementation ('net.dv8tion:JDA:4.2.1_253') {
+        exclude module: 'opus-java'
+    }
+    implementation 'com.google.code.gson:gson:2.8.6'
+}
