@@ -56,7 +56,7 @@ public class MilkshakeListener extends ListenerAdapter {
             String[] args = content.replace("m!create", "").split("[|]");
             String INCORRECT_COMMAND = "**Comando incorreto**:\n`m!create [nome do template] | [x] [y] [largura] [altura] [texto] [prioridade] [nº da source] [cor] [orientação] [fonte] | [...]`\n" +
                     "**Lista de cores:** <https://imagemagick.org/script/color.php#color_names>\n**Lista de orientações:** <https://www.imagemagick.org/script/command-line-options.php#gravity>\n" +
-                    "**Lista de fontes:** <https://cdn.discordapp.com/attachments/840301579852316674/840989377198948432/message.txt>";
+                    "**Lista de fontes:** use `magick identify -list font` para pegar todas fontes";
             if (args.length < 2) {
                 channel.sendMessage(INCORRECT_COMMAND).queue();
             } else {
@@ -187,6 +187,11 @@ public class MilkshakeListener extends ListenerAdapter {
                     channel.sendMessage("**Não foi possível encontrar uma imagem**").queue();
                 } else {
                     File sourceFile = new File("sources",sourceName + ".sundae");
+                    int idx = 0;
+                    while (sourceFile.exists()) {
+                        idx++;
+                        sourceFile = new File("sources", sourceName + "-" + idx + ".sundae");
+                    }
                     File file = new File("images", UUID.randomUUID() + ".png");
                     try {
                         JsonObject jsonObject = new JsonObject();
