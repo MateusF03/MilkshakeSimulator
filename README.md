@@ -3,7 +3,7 @@ A ShitpostBot and Feijoada Simulator inspired Portuguese Discord bot
 
 ## Dependencies
 This bot only has one dependency
-* [ImageMagick](http://github.com) - for most of the image processing
+* [ImageMagick](https://imagemagick.org) - for most of the image processing
 
 ## Compile
 To compile the bot you are going to need [Gradle](https://gradle.org/), after that, clone the repository and input the following command in the created folder
