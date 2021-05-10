@@ -32,6 +32,9 @@ public class MilkshakeListener extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+        if (event.getAuthor().isBot()) {
+            return;
+        }
         String content = event.getMessage().getContentRaw();
         TextChannel channel = event.getChannel();
         if (content.startsWith("m!generate")) {
