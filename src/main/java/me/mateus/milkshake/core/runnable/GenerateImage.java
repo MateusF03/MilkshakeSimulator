@@ -49,9 +49,10 @@ public class GenerateImage implements Runnable {
                 String color = textRegion.getColor().isEmpty() ? "black" : textRegion.getColor();
                 String font = textRegion.getFont().isEmpty() ? "Arial" : textRegion.getFont();
                 String orientation = textRegion.getOrientation().isEmpty() ? "center" : textRegion.getOrientation();
+                String strokeParam = textRegion.getStrokeColor().isEmpty() ? "" : "-stroke " + textRegion.getStrokeColor() + " -strokewidth " + textRegion.getStrokeWidth();
                 ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c",
-                        String.format("magick convert -background transparent -fill %s -font %s -gravity %s -size %dx%d caption:\"%s\" %s",
-                                color,font,orientation,textRegion.getWidth(), textRegion.getHeight(), text, tempFile.getPath()));
+                        String.format("magick convert -background transparent -fill %s -font %s -gravity %s %s -size %dx%d caption:\"%s\" %s",
+                                color,font,orientation,strokeParam,textRegion.getWidth(), textRegion.getHeight(), text, tempFile.getPath()));
                 processBuilder.redirectErrorStream(true);
                 Process p = processBuilder.start();
                 BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
