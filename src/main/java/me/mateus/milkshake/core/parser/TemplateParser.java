@@ -42,6 +42,8 @@ public class TemplateParser {
             String color = "";
             String orientation = "";
             String font = "";
+            String strokeColor = "";
+            int strokeWidth = 0;
             if (regionObject.has("source-name")) {
                 sourceName = regionObject.get("source-name").getAsInt();
             }
@@ -54,7 +56,13 @@ public class TemplateParser {
             if (regionObject.has("font")) {
                 font = regionObject.get("font").getAsString();
             }
-            sourceRegions.add(new SourceRegion(x, y, width, height, priority, isText, sourceName, color, orientation, font));
+            if (regionObject.has("stroke-color")) {
+                strokeColor = regionObject.get("stroke-color").getAsString();
+            }
+            if (regionObject.has("stroke-width")) {
+                strokeWidth = regionObject.get("stroke-width").getAsInt();
+            }
+            sourceRegions.add(new SourceRegion(x, y, width, height, priority, isText, sourceName, color, orientation, font, strokeColor, strokeWidth));
         }
         Template template = new Template(name, image, sourceRegions, imageFile);
         template.setOriginalFile(originalFile);

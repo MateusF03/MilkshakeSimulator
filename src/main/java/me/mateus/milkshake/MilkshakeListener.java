@@ -91,6 +91,8 @@ public class MilkshakeListener extends ListenerAdapter {
                                 String color = "";
                                 String orientation = "";
                                 String font = "";
+                                String strokeColor = "";
+                                int strokeWidth = 0;
                                 if (values.length >= 5) {
                                     text = Boolean.parseBoolean(values[4]);
                                 }
@@ -112,16 +114,23 @@ public class MilkshakeListener extends ListenerAdapter {
                                 if (values.length >= 10) {
                                     font = values[9];
                                 }
-                                sourceRegions.add(new SourceRegion(x, y, width, height, priority, text, sourceName, color, orientation, font));
+                                if (values.length >= 11) {
+                                    strokeColor = values[10];
+                                }
+                                if (values.length >= 12) {
+                                    strokeWidth = Integer.parseInt(values[11]);
+                                }
+                                sourceRegions.add(new SourceRegion(x, y, width, height, priority, text, sourceName, color, orientation, font, strokeColor, strokeWidth));
                             } catch (NumberFormatException e) {
                                 channel.sendMessage(INCORRECT_COMMAND).queue();
+                                return;
                             }
 
                         }
                     }
 
                     String fileName = UUID.randomUUID() + ".png";
-                    File file = new File("images", fileName);
+                    File file = new File("images", fileName.replace("-",""));
                     try {
                         ImageIO.write(image, "png", file);
                     } catch (IOException e) {
@@ -192,7 +201,7 @@ public class MilkshakeListener extends ListenerAdapter {
                         idx++;
                         sourceFile = new File("sources", sourceName + "-" + idx + ".sundae");
                     }
-                    File file = new File("images", UUID.randomUUID() + ".png");
+                    File file = new File("images", UUID.randomUUID().toString().replace("-","") + ".png");
                     try {
                         JsonObject jsonObject = new JsonObject();
                         jsonObject.addProperty("name", sourceName);

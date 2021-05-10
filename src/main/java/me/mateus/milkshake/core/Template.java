@@ -46,6 +46,8 @@ public class Template {
             regionObject.addProperty("color", sourceRegion.getColor());
             regionObject.addProperty("orientation", sourceRegion.getOrientation());
             regionObject.addProperty("font", sourceRegion.getFont());
+            regionObject.addProperty("stroke-color", sourceRegion.getStrokeColor());
+            regionObject.addProperty("stroke-width", sourceRegion.getStrokeWidth());
             jsonArray.add(regionObject);
         }
 

@@ -42,23 +42,24 @@ public class GenerateImage implements Runnable {
         List<SourceRegion> textRegions = sourceRegions.stream().filter(SourceRegion::isText).collect(Collectors.toList());
         Map<String, File> textBoxesFile = new HashMap<>();
         for (SourceRegion textRegion : textRegions) {
-            String fileName = UUID.randomUUID() + ".png";
-            String text = sources.get(textRegion.getSourceName()).getText();
-            String color = textRegion.getColor().isEmpty() ? "black" : textRegion.getColor();
-            String font = textRegion.getFont().isEmpty() ? "Arial" : textRegion.getFont();
-            String orientation = textRegion.getOrientation().isEmpty() ? "center" : textRegion.getOrientation();
-            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c",
-                    String.format("magick convert -background transparent -fill %s -font %s -gravity %s -size %dx%d caption:\"%s\" %s",
-                            color,font,orientation,textRegion.getWidth(), textRegion.getHeight(), text, fileName));
-            processBuilder.redirectErrorStream(true);
             try {
+                File tempFile = File.createTempFile("text",".png");
+                tempFile.deleteOnExit();
+                String text = sources.get(textRegion.getSourceName()).getText();
+                String color = textRegion.getColor().isEmpty() ? "black" : textRegion.getColor();
+                String font = textRegion.getFont().isEmpty() ? "Arial" : textRegion.getFont();
+                String orientation = textRegion.getOrientation().isEmpty() ? "center" : textRegion.getOrientation();
+                ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c",
+                        String.format("magick convert -background transparent -fill %s -font %s -gravity %s -size %dx%d caption:\"%s\" %s",
+                                color,font,orientation,textRegion.getWidth(), textRegion.getHeight(), text, tempFile.getPath()));
+                processBuilder.redirectErrorStream(true);
                 Process p = processBuilder.start();
                 BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
                 String line;
                 while ((line = r.readLine()) != null) {
                     System.out.println(line);
                 }
-                textBoxesFile.put(textRegion.getX() + ":" + textRegion.getY(), new File(fileName));
+                textBoxesFile.put(textRegion.getX() + ":" + textRegion.getY(), tempFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -101,22 +102,20 @@ public class GenerateImage implements Runnable {
         });
         String string = stringBuilder.toString();
         //System.out.println(string);
-        String generatedImage = UUID.randomUUID() + ".png";
-        ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", "magick convert -size "+ width + "x" + height + " xc:white -font Arial" + string + " " + generatedImage);
-        processBuilder.redirectErrorStream(true);
         try {
+            File generatedImage = File.createTempFile("milkshake", ".png");
+            generatedImage.deleteOnExit();
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", "magick convert -size "+ width + "x" + height + " xc:white -font Arial" + string + " " + generatedImage.getPath());
+            processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
             BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = r.readLine()) != null) {
                 System.out.println(line);
             }
-            File generatedFile = new File(generatedImage);
-            BufferedImage image = ImageIO.read(generatedFile);
+            BufferedImage image = ImageIO.read(generatedImage);
             message.delete().queue();
             event.getChannel().sendFile(Objects.requireNonNull(ImageUtils.bufferedImageToBytes(image)), "generated.png").queue();
-            generatedFile.delete();
-            textBoxesFile.forEach((s, f) -> f.delete());
             MilkshakeSimulator.processing = false;
         } catch (IOException e) {
             e.printStackTrace();
