@@ -12,6 +12,10 @@ gradle shadowJar
 ```
 The created jar will be at the `build/libs` path
 
+## Bot setup
+
+The portuguese guide to setup this bot is in [guide/SETUP_PTBR.md](https://github.com/TheMFjulio/MilkshakeSimulator/blob/master/guide/SETUP_PTBR.md)
+
 ## Contributing
 Pull requests are welcome. For any suggestions or critics, please open an issue first to discuss what you would like to change.
 
