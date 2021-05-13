@@ -1,7 +1,6 @@
-package me.mateus.milkshake.core;
+package me.mateus.milkshake.core.milkshake;
 
 public class SourceRegion {
-
     private final int x;
     private final int y;
     private final int width;
@@ -14,8 +13,9 @@ public class SourceRegion {
     private final String font;
     private final String strokeColor;
     private final int strokeWidth;
+    private final Point[] points = new Point[4];
 
-    public SourceRegion(int x, int y, int width, int height, int priority, boolean isText, int sourceName, String color, String orientation, String font, String strokeColor, int strokeWidth) {
+    public SourceRegion(int x, int y, int width, int height, int priority, boolean isText, int sourceName, String color, String orientation, String font, String strokeColor, int strokeWidth, Point... points) {
 
         this.x = x;
         this.y = y;
@@ -29,6 +29,9 @@ public class SourceRegion {
         this.font = font;
         this.strokeColor = strokeColor;
         this.strokeWidth = strokeWidth;
+        if (points != null) {
+            System.arraycopy(points, 0, this.points, 0, 4);
+        }
     }
 
     public int getX() {
@@ -77,5 +80,9 @@ public class SourceRegion {
 
     public int getStrokeWidth() {
         return strokeWidth;
+    }
+
+    public Point[] getPoints() {
+        return points;
     }
 }
