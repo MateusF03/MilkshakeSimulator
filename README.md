@@ -14,3 +14,7 @@ The created jar will be at the `build/libs` path
 
 ## Contributing
 Pull requests are welcome. For any suggestions or critics, please open an issue first to discuss what you would like to change.
+
+## Credits
+* [Quinella](https://github.com/HeyZeer0/Quinella) for inspiration of the new command system
+* [Feijoada Simulator](https://twitter.com/FeijoadaSim) and [Shitpost Bot](https://www.shitpostbot.com/) for inspiration with the bot idea
