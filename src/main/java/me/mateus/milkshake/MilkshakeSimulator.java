@@ -19,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
 public class MilkshakeSimulator {
@@ -28,7 +27,7 @@ public class MilkshakeSimulator {
     public static final Set<Long> VIPS = new HashSet<>();
     public static boolean running = true;
 
-    public static void main(String[] args) throws IOException, LoginException, InterruptedException {
+    public static void main(String[] args) throws IOException, LoginException {
         File tokenFile = new File("token.txt");
         File vipsFile = new File("vips.txt");
 
@@ -62,18 +61,5 @@ public class MilkshakeSimulator {
         JDA jda = JDABuilder.createDefault(token)
                 .addEventListeners(new CommandListener())
                 .build();
-        jda.awaitReady();
-        Thread consoleThread = new Thread(() -> {
-            Scanner scanner = new Scanner(System.in);
-            while (scanner.hasNext()) {
-                String next = scanner.next();
-                if (next.equalsIgnoreCase("shutdown")) {
-                    jda.shutdown();
-                    running = false;
-                    System.exit(0);
-                }
-            }
-        });
-        consoleThread.start();
     }
 }
