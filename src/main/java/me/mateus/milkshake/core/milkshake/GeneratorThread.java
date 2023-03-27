@@ -62,6 +62,11 @@ public class GeneratorThread extends Thread {
                     addToQueue(createMilkshake(template));
                 }
             }
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
