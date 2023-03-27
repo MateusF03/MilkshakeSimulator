@@ -3,7 +3,7 @@ package me.mateus.milkshake.core.listeners;
 import me.mateus.milkshake.core.milkshake.MilkshakeManager;
 import me.mateus.milkshake.core.milkshake.Source;
 import me.mateus.milkshake.core.utils.StringComparator;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +29,9 @@ public class DeleteSourceListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (!event.isFromGuild())
+            return;
         if (event.getAuthor().getIdLong() != userId || event.getChannel().getIdLong() != channelId) {
             return;
         }

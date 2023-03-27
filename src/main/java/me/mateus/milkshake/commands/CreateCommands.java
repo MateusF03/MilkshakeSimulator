@@ -15,7 +15,7 @@ import me.mateus.milkshake.core.milkshake.SourceRegion;
 import me.mateus.milkshake.core.milkshake.Template;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -34,7 +34,7 @@ public class CreateCommands {
             @Argument(name = "name", type = ArgumentType.STRING, obligatory = true),
             @Argument(name = "regions", type = ArgumentType.REGIONS, obligatory = true)
     })
-    public void create(GuildMessageReceivedEvent event, ArgumentTranslator argumentTranslator) {
+    public void create(MessageReceivedEvent event, ArgumentTranslator argumentTranslator) {
         String name = argumentTranslator.getAsString("name");
         if (name.length() > 64) {
             event.getChannel().sendMessage("**O limite de caracteres no nome é 64**").queue();
@@ -93,7 +93,7 @@ public class CreateCommands {
     @Command(name = "add", description = "Adiciona um texto", args = {
             @Argument(name = "text", type = ArgumentType.STRING, obligatory = true)
     })
-    public void add(GuildMessageReceivedEvent event, ArgumentTranslator translator) {
+    public void add(MessageReceivedEvent event, ArgumentTranslator translator) {
 
         MilkshakeManager manager = MilkshakeManager.getInstance();
         try {
@@ -112,7 +112,7 @@ public class CreateCommands {
     @Command(name = "eliminar", description = "Deleta um template", vipOnly = true, args = {
             @Argument(name = "template", type = ArgumentType.STRING, obligatory = true)
     })
-    public void delete(GuildMessageReceivedEvent event, ArgumentTranslator translator) {
+    public void delete(MessageReceivedEvent event, ArgumentTranslator translator) {
         String name = translator.getAsString("template");
         MilkshakeManager manager = MilkshakeManager.getInstance();
         Template t = manager.getTemplateByName(name);
@@ -132,7 +132,7 @@ public class CreateCommands {
     @Command(name = "source", description = "Cria uma source", args = {
             @Argument(name = "name", type = ArgumentType.STRING, obligatory = true)
     })
-    public void source(GuildMessageReceivedEvent event, ArgumentTranslator translator) {
+    public void source(MessageReceivedEvent event, ArgumentTranslator translator) {
         String name = translator.getAsString("name");
         if (name.length() > 64) {
             event.getChannel().sendMessage("**O limite de caracteres no nome é 64**").queue();
@@ -169,7 +169,7 @@ public class CreateCommands {
             @Argument(name = "oldName", type = ArgumentType.STRING, obligatory = true),
             @Argument(name = "newName", type = ArgumentType.STRING, obligatory = true)
     })
-    public void rename(GuildMessageReceivedEvent event, ArgumentTranslator translator) {
+    public void rename(MessageReceivedEvent event, ArgumentTranslator translator) {
         String oldName = translator.getAsString("oldName");
         String newName = translator.getAsString("newName");
         List<Source> sources = MilkshakeManager.getInstance().getSourcesByName(oldName);
@@ -198,13 +198,13 @@ public class CreateCommands {
             description.append("`\n**Digite:** `Nº da source | novo nome` **para trocar de nome e** `Nº da source` **apenas para ver a imagem da source**");
             embedBuilder.setDescription(description.toString());
             embedBuilder.setFooter("Digite &&cancel para cancelar");
-            event.getChannel().sendMessage(embedBuilder.build()).queue();
+            event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
             event.getJDA().addEventListener(new RenameSourceListener(event.getAuthor().getIdLong(),event.getChannel().getIdLong() , sources));
         }
     }
 
     @Command(name = "guide", description = "Envia um guia de como criar template")
-    public void guide(GuildMessageReceivedEvent event, ArgumentTranslator translator) {
+    public void guide(MessageReceivedEvent event, ArgumentTranslator translator) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("Guia de como criar templates:");
         embedBuilder.setColor(0xb28dff);
@@ -224,12 +224,12 @@ public class CreateCommands {
         embedBuilder.setDescription(description);
         String links = "**Lista de cores:** <https://imagemagick.org/script/color.php#color_names>\n**Lista de orientações:** <https://www.imagemagick.org/script/command-line-options.php#gravity>\n" +
                 "**Lista de fontes:** use `magick identify -list font` para pegar todas fontes";
-        event.getChannel().sendMessage(embedBuilder.build()).queue();
+        event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
         event.getChannel().sendMessage(links).queue();
     }
 
     @Command(name = "help", description = "O comando para listar todos os outros comandos do bot")
-    public void help(GuildMessageReceivedEvent event, ArgumentTranslator translator)  {
+    public void help(MessageReceivedEvent event, ArgumentTranslator translator)  {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("Comandos:");
         embedBuilder.setColor(0xb28dff);
@@ -242,13 +242,13 @@ public class CreateCommands {
         }
         description.append('`');
         embedBuilder.setDescription(description.toString());
-        event.getChannel().sendMessage(embedBuilder.build()).queue();
+        event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
     }
 
     @Command(name = "eliminarSource", description = "Elimina uma source",vipOnly = true, args = {
             @Argument(name = "sourceName", type = ArgumentType.STRING, obligatory = true)
     })
-    public void removeSource(GuildMessageReceivedEvent event, ArgumentTranslator translator) {
+    public void removeSource(MessageReceivedEvent event, ArgumentTranslator translator) {
         String sourceName = translator.getAsString("sourceName");
         List<Source> sources = MilkshakeManager.getInstance().getSourcesByName(sourceName);
 
@@ -277,7 +277,7 @@ public class CreateCommands {
             description.append("`\n**Digite:** `Nº da source` **para deleter e** `&&ver Nº da source` **apenas para ver a imagem da source**");
             embedBuilder.setDescription(description.toString());
             embedBuilder.setFooter("Digite &&cancel para cancelar");
-            event.getChannel().sendMessage(embedBuilder.build()).queue();
+            event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
             event.getJDA().addEventListener(new DeleteSourceListener(event.getAuthor().getIdLong(),event.getChannel().getIdLong() , sources));
         }
     }

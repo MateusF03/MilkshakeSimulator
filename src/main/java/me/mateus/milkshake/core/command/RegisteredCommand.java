@@ -3,6 +3,7 @@ package me.mateus.milkshake.core.command;
 import me.mateus.milkshake.core.command.interfaces.Argument;
 import me.mateus.milkshake.core.command.interfaces.Command;
 import me.mateus.milkshake.core.command.translator.ArgumentTranslator;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.lang.reflect.InvocationTargetException;
@@ -42,7 +43,7 @@ public class RegisteredCommand {
         return arguments;
     }
 
-    public void execute(GuildMessageReceivedEvent event, ArgumentTranslator argumentTranslator) {
+    public void execute(MessageReceivedEvent event, ArgumentTranslator argumentTranslator) {
         try {
             method.invoke(object, event, argumentTranslator);
         } catch (IllegalAccessException | InvocationTargetException e) {

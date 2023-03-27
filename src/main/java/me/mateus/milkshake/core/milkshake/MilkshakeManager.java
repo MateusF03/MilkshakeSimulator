@@ -19,16 +19,12 @@ public class MilkshakeManager {
 
     private MilkshakeManager() {}
 
-    private static MilkshakeManager instance;
+    private static final class MilkshakeManagerHolder {
+        static final MilkshakeManager instance = new MilkshakeManager();
+    }
+
     public static MilkshakeManager getInstance() {
-        if (instance == null) {
-            synchronized (MilkshakeManager.class) {
-                if (instance == null) {
-                    instance = new MilkshakeManager();
-                }
-            }
-        }
-        return instance;
+        return MilkshakeManagerHolder.instance;
     }
 
     public static final Gson GSON = new GsonBuilder()

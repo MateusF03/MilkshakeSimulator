@@ -5,14 +5,14 @@ import me.mateus.milkshake.core.command.interfaces.Argument;
 import me.mateus.milkshake.core.command.interfaces.Command;
 import me.mateus.milkshake.core.command.translator.ArgumentTranslator;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SayCommand {
 
     @Command(name = "say", description = "Diz algo em um canal", vipOnly = true, args =
             {@Argument(name = "channel", type = ArgumentType.STRING, obligatory = true),
             @Argument(name = "text", type = ArgumentType.STRING, obligatory = true)})
-    public void say(GuildMessageReceivedEvent event, ArgumentTranslator argumentTranslator) {
+    public void say(MessageReceivedEvent event, ArgumentTranslator argumentTranslator) {
         String channel = argumentTranslator.getAsString("channel");
         String text = argumentTranslator.getAsString("text");
 

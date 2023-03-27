@@ -8,6 +8,7 @@ import me.mateus.milkshake.core.milkshake.SourceRegion;
 import me.mateus.milkshake.core.utils.StringComparator;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.io.File;
@@ -24,17 +25,12 @@ public class CommandManager {
 
     private String prefix = "m!";
 
-    private static CommandManager instance;
+    private static final class CommandManagerInstanceHolder {
+        static final CommandManager instance = new CommandManager();
+    }
 
     public static CommandManager getInstance() {
-        if (instance == null) {
-            synchronized (CommandManager.class) {
-                if (instance == null) {
-                    instance = new CommandManager();
-                }
-            }
-        }
-        return instance;
+        return CommandManagerInstanceHolder.instance;
     }
 
     private final List<RegisteredCommand> commands = new ArrayList<>();
@@ -95,7 +91,7 @@ public class CommandManager {
         return prefix;
     }
 
-    public void runCommand(GuildMessageReceivedEvent event) {
+    public void runCommand(MessageReceivedEvent event) {
         String messageRaw = event.getMessage().getContentRaw();
         if (!messageRaw.startsWith(prefix))
             return;
@@ -107,7 +103,7 @@ public class CommandManager {
         if (command == null)
             return;
         User author = event.getAuthor();
-        TextChannel channel = event.getChannel();
+        TextChannel channel = event.getTextChannel();
         if (command.isVipOnly() && !MilkshakeSimulator.VIPS.contains(author.getIdLong())) {
             channel.sendMessage("**Você não tem permissão de executar este comando**").queue();
             return;

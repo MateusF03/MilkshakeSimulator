@@ -8,7 +8,7 @@ import me.mateus.milkshake.core.milkshake.GeneratorThread;
 import me.mateus.milkshake.core.milkshake.Milkshake;
 import me.mateus.milkshake.core.milkshake.MilkshakeManager;
 import me.mateus.milkshake.core.milkshake.Template;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -25,7 +25,7 @@ public class GenerateCommand {
     }
 
     @Command(name = "generate", description = "Gera um milkshake")
-    public void generate(GuildMessageReceivedEvent event, ArgumentTranslator argumentTranslator) {
+    public void generate(MessageReceivedEvent event, ArgumentTranslator argumentTranslator) {
         Milkshake milkshake = thread.getMilkshake();
         event.getChannel().sendMessage("**Processando...**").queue(m -> {
             try {
@@ -46,7 +46,7 @@ public class GenerateCommand {
     @Command(name = "forceGenerate", description = "Gera um milkshake forçadamente", vipOnly = true, args = {
             @Argument(name = "templateName", type = ArgumentType.STRING, obligatory = true)
     })
-    public void forceGenerate(GuildMessageReceivedEvent event, ArgumentTranslator argumentTranslator) {
+    public void forceGenerate(MessageReceivedEvent event, ArgumentTranslator argumentTranslator) {
         String templateName = argumentTranslator.getAsString("templateName");
         MilkshakeManager manager = MilkshakeManager.getInstance();
         Template template = manager.getTemplateByName(templateName);
