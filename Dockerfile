@@ -21,5 +21,5 @@ RUN apk add --no-cache imagemagick
 
 COPY --from=build /repo/build/milkshake.jar /usr/share
 
-WORKDIR /var/spool/milkshake
+WORKDIR /var/lib/milkshake
 ENTRYPOINT [ "java", "-jar", "/usr/share/milkshake.jar" ]
