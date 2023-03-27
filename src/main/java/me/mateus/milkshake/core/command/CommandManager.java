@@ -69,7 +69,7 @@ public class CommandManager {
 
     public void setupPrefix(Dotenv dotenv) throws IOException {
         String givenPrefix = dotenv.get("MILKSHAKE_PREFIX");
-        if (givenPrefix.isEmpty())
+        if (givenPrefix.isEmpty() || givenPrefix.equals("<prefix>"))
             this.prefix = "m!";
         else
             this.prefix = givenPrefix;

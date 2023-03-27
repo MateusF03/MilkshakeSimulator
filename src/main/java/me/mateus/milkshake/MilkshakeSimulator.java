@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,13 +33,16 @@ public class MilkshakeSimulator {
     public static boolean running = true;
 
     public static void main(String[] args) throws IOException, LoginException {
+        if (!Files.exists(Path.of(".env")))
+            Files.createFile(Path.of(".env"));
+
         Dotenv dotenv = Dotenv.load();
 
         File vipsFile = new File("vips.txt");
 
         String token = dotenv.get("MILKSHAKE_TOKEN");
-        if (token.isEmpty()) {
-            LOGGER.error("Não foi possível ler a variável `MILKSHAKE_TOKEN`, especifique-a na execução ou em um arquivo `.env`");
+        if (token.isEmpty() || token.equals("<token>")) {
+            LOGGER.error("Não foi possível ler a variável `MILKSHAKE_TOKEN`, especifique-a na execução ou no arquivo `.env`");
             return;
         }
         if (vipsFile.exists()) {
