@@ -9,6 +9,7 @@ import me.mateus.milkshake.core.command.CommandManager;
 import me.mateus.milkshake.core.milkshake.MilkshakeManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,7 @@ public class MilkshakeSimulator {
         manager.registerCommands(new CreateCommands());
         manager.registerCommands(new AdminCommands());
         JDA jda = JDABuilder.createDefault(token)
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
                 .addEventListeners(new CommandListener())
                 .build();
     }
