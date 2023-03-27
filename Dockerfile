@@ -19,5 +19,7 @@ FROM base AS final
 RUN apk add --no-cache openjdk17-jre-headless
 RUN apk add --no-cache imagemagick
 
-COPY --from=build /repo/build/milkshake.jar /usr/bin
-ENTRYPOINT [ "/usr/bin/java", "-jar", "/usr/bin/milkshake.jar" ]
+COPY --from=build /repo/build/milkshake.jar /usr/share
+
+WORKDIR /var/milkshake
+ENTRYPOINT [ "java", "-jar", "/usr/share/milkshake.jar" ]
