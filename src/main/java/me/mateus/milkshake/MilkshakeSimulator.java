@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
@@ -29,16 +31,13 @@ public class MilkshakeSimulator {
     public static boolean running = true;
 
     public static void main(String[] args) throws IOException, LoginException {
-        File tokenFile = new File("token.txt");
+        Dotenv dotenv = Dotenv.load();
+
         File vipsFile = new File("vips.txt");
 
-        if (!tokenFile.exists()) {
-            LOGGER.info("Não foi possível encontrar o arquivo de token, irei tentar criar ele...");
-            if (!tokenFile.createNewFile()) {
-                LOGGER.error("Não consegui criar o arquivo de token");
-                return;
-            }
-            LOGGER.info("Arquivo de token criado com sucesso! Escreva o token dentro dele.");
+        String token = dotenv.get("MILKSHAKE_TOKEN");
+        if (token.isEmpty()) {
+            LOGGER.error("Não foi possível ler a variável `MILKSHAKE_TOKEN`, especifique-a na execução ou em um arquivo `.env`");
             return;
         }
         if (vipsFile.exists()) {
@@ -46,20 +45,14 @@ public class MilkshakeSimulator {
             lines.forEach(l -> VIPS.add(Long.parseLong(l)));
         }
 
-        byte[] bytes = Files.readAllBytes(tokenFile.toPath());
-        String token = new String(bytes, StandardCharsets.UTF_8);
-        if (token.isEmpty()) {
-            LOGGER.info("O arquivo de token está vazio");
-            return;
-        }
         CommandManager manager = CommandManager.getInstance();
-        manager.setupPrefix();
+        manager.setupPrefix(dotenv);
         manager.registerCommands(new SayCommand());
         MilkshakeManager.getInstance().setupMilkshakes();
         manager.registerCommands(new GenerateCommand());
         manager.registerCommands(new CreateCommands());
         manager.registerCommands(new AdminCommands());
-        JDA jda = JDABuilder.createDefault(token.strip())
+        JDA jda = JDABuilder.createDefault(token)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
                 .addEventListeners(new CommandListener())
                 .build();

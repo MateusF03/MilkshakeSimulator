@@ -18,6 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.cdimascio.dotenv.Dotenv;
 public class CommandManager {
 
     private CommandManager() {}
@@ -65,20 +67,12 @@ public class CommandManager {
         return commands;
     }
 
-    public void setupPrefix() throws IOException {
-        File prefixFile = new File("prefix.txt");
-        if (!prefixFile.exists()) {
-            if (!prefixFile.createNewFile()) {
-                System.err.println("ERRO AO CRIAR ARQUIVO DE PREFIX");
-                return;
-            }
-            Files.writeString(prefixFile.toPath(), "m!");
-        } else {
-            String content = Files.readString(prefixFile.toPath());
-            if (!content.isEmpty()) {
-                this.prefix = content;
-            }
-        }
+    public void setupPrefix(Dotenv dotenv) throws IOException {
+        String givenPrefix = dotenv.get("MILKSHAKE_PREFIX");
+        if (givenPrefix.isEmpty())
+            this.prefix = "m!";
+        else
+            this.prefix = givenPrefix;
     }
 
 
