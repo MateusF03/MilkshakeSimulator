@@ -22,7 +22,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
@@ -74,7 +73,7 @@ public class CreateCommands {
 
         File templateFile = new File("templates", name.replaceAll("[^a-zA-Z0-9.\\-]", "_") + ".milkshake");
         try {
-            Files.write(templateFile.toPath(), MilkshakeManager.GSON.toJson(jsonObject).getBytes(StandardCharsets.UTF_8));
+            Files.writeString(templateFile.toPath(), MilkshakeManager.GSON.toJson(jsonObject));
             template.setOriginalFilePath(templateFile.getPath());
             template.setWidth(image.getWidth());
             template.setHeight(image.getHeight());
@@ -156,7 +155,7 @@ public class CreateCommands {
             ImageIO.write(image, "png",imageFile);
             Source source = new Source(name, imageFile.getPath(), file.getPath(), "");
             String json = MilkshakeManager.GSON.toJson(source, Source.class);
-            Files.write(file.toPath(), json.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(file.toPath(), json);
             MilkshakeManager.getInstance().addSource(source);
 
             event.getChannel().sendMessage("**Source adicionada!**").queue();
@@ -208,22 +207,26 @@ public class CreateCommands {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("Guia de como criar templates:");
         embedBuilder.setColor(0xb28dff);
-        String description = "**Parâmetros:**\n`" +
-                "-x/p1: A coordenada X da imagem ou o ponto 1 (x,y)\n" +
-                "-y/p2: A coordenada Y da imagem ou o ponto 2 (x,y)\n" +
-                "-width/p3: A largura da imagem ou o ponto 3 (x,y)\n" +
-                "-height/p4: A altura da imagem ou o ponto 4 (x,y)\n" +
-                "-nº da source: O número da source, todas as sources com o mesmo número são iguais\n" +
-                "-texto: true/false, se a região é um texto ou não\n" +
-                "-prioridade: A prioridade da imagem, prioridades menores de 0 serão desenhadas antes do template, ficando no background\n" +
-                "-cor: A cor do texto em hexadecimal (#rrggbb)\n" +
-                "-orientação: A orientação do texto\n" +
-                "-fonte: A fonte do texto\n" +
-                "-cor da borda: A cor da borda do texto\n" +
-                "-tamanho da borda: O tamanho da borda do texto\n" + '`';
+        String description = """
+                **Parâmetros:**
+                `-x/p1: A coordenada X da imagem ou o ponto 1 (x,y)
+                -y/p2: A coordenada Y da imagem ou o ponto 2 (x,y)
+                -width/p3: A largura da imagem ou o ponto 3 (x,y)
+                -height/p4: A altura da imagem ou o ponto 4 (x,y)
+                -nº da source: O número da source, todas as sources com o mesmo número são iguais
+                -texto: true/false, se a região é um texto ou não
+                -prioridade: A prioridade da imagem, prioridades menores de 0 serão desenhadas antes do template, ficando no background
+                -cor: A cor do texto em hexadecimal (#rrggbb)
+                -orientação: A orientação do texto
+                -fonte: A fonte do texto
+                -cor da borda: A cor da borda do texto
+                -tamanho da borda: O tamanho da borda do texto
+                `""";
         embedBuilder.setDescription(description);
-        String links = "**Lista de cores:** <https://imagemagick.org/script/color.php#color_names>\n**Lista de orientações:** <https://www.imagemagick.org/script/command-line-options.php#gravity>\n" +
-                "**Lista de fontes:** use `magick identify -list font` para pegar todas fontes";
+        String links = """
+                **Lista de cores:** <https://imagemagick.org/script/color.php#color_names>
+                **Lista de orientações:** <https://www.imagemagick.org/script/command-line-options.php#gravity>
+                **Lista de fontes:** use `magick identify -list font` para pegar todas fontes""";
         event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
         event.getChannel().sendMessage(links).queue();
     }
@@ -294,7 +297,7 @@ public class CreateCommands {
         List<Message.Attachment> attachments = message.getAttachments();
         if (!attachments.isEmpty()) {
             try {
-                return attachments.get(0).retrieveInputStream().get();
+                return attachments.get(0).getProxy().download().get();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }

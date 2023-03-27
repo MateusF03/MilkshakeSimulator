@@ -4,7 +4,6 @@ import me.mateus.milkshake.core.command.interfaces.Argument;
 import me.mateus.milkshake.core.command.interfaces.Command;
 import me.mateus.milkshake.core.command.translator.ArgumentTranslator;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

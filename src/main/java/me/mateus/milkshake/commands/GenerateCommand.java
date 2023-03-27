@@ -9,6 +9,7 @@ import me.mateus.milkshake.core.milkshake.Milkshake;
 import me.mateus.milkshake.core.milkshake.MilkshakeManager;
 import me.mateus.milkshake.core.milkshake.Template;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -36,7 +37,7 @@ public class GenerateCommand {
                     return;
                 }
                 m.delete().queue();
-                event.getChannel().sendFile(array, "generated.png").queue();
+                event.getChannel().sendFiles(FileUpload.fromData(array, "generated.png")).queue();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -64,7 +65,7 @@ public class GenerateCommand {
                     return;
                 }
                 m.delete().queue();
-                event.getChannel().sendFile(array, "generated.png").queue();
+                event.getChannel().sendFiles(FileUpload.fromData(array, "generated.png")).queue();
             } catch (IOException e) {
                 e.printStackTrace();
             }
