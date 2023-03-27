@@ -2,3 +2,7 @@ bin
 build
 .idea
 .gradle
+
+prefix.txt
+token.txt
+texts.json

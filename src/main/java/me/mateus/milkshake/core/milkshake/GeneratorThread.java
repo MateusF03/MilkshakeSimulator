@@ -53,8 +53,11 @@ public class GeneratorThread extends Thread {
         while (MilkshakeSimulator.running) {
             if (milkshakes.size() < 3) {
                 MilkshakeManager manager = MilkshakeManager.getInstance();
-                Template template = manager.getTemplates().get(random.nextInt(manager.getTemplates().size()));
-                addToQueue(createMilkshake(template));
+                int templateCount = manager.getTemplates().size();
+                if (templateCount > 0) {
+                    Template template = manager.getTemplates().get(random.nextInt(templateCount));
+                    addToQueue(createMilkshake(template));
+                }
             }
         }
     }
