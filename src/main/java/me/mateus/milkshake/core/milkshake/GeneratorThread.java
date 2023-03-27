@@ -42,8 +42,11 @@ public class GeneratorThread extends Thread {
         Milkshake milkshake = milkshakes.poll();
         if (milkshake == null ) {
             MilkshakeManager manager = MilkshakeManager.getInstance();
-            Template template = manager.getTemplates().get(random.nextInt(manager.getTemplates().size()));
-            return createMilkshake(template);
+            int templateCount = manager.getTemplates().size();
+            if (templateCount > 0) {
+                Template template = manager.getTemplates().get(random.nextInt(manager.getTemplates().size()));
+                return createMilkshake(template);
+            }
         }
         return milkshake;
     }
