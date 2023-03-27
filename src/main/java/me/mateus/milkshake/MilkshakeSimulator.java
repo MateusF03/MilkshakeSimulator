@@ -59,7 +59,7 @@ public class MilkshakeSimulator {
         manager.registerCommands(new GenerateCommand());
         manager.registerCommands(new CreateCommands());
         manager.registerCommands(new AdminCommands());
-        JDA jda = JDABuilder.createDefault(token)
+        JDA jda = JDABuilder.createDefault(token.strip())
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
                 .addEventListeners(new CommandListener())
                 .build();
