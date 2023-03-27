@@ -137,7 +137,7 @@ public class CommandManager {
             return false;
         Parameter param1 = params[0];
         Parameter param2 = params[1];
-        if (!GuildMessageReceivedEvent.class.isAssignableFrom(param1.getType())) {
+        if (!MessageReceivedEvent.class.isAssignableFrom(param1.getType())) {
             return false;
         }
         return ArgumentTranslator.class.isAssignableFrom(param2.getType());
