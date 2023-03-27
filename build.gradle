@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation ('net.dv8tion:JDA:4.2.1_253') {
+    implementation ('net.dv8tion:JDA:4.4.0_350') {
         exclude module: 'opus-java'
     }
     implementation 'com.google.code.gson:gson:2.8.6'
