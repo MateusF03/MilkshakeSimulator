@@ -104,7 +104,7 @@ public class GeneratorThread extends Thread {
                 String font = textRegion.getFont().isEmpty() ? "Arial" : textRegion.getFont();
                 String orientation = textRegion.getOrientation().isEmpty() ? "center" : textRegion.getOrientation();
                 String strokeParam = textRegion.getStrokeColor().isEmpty() ? "" : "-stroke " + textRegion.getStrokeColor() + " -strokewidth " + textRegion.getStrokeWidth();
-                ProcessBuilder processBuilder = new ProcessBuilder("magick convert " +
+                ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", "magick convert " +
                         String.format("-background transparent -fill %s -font %s -gravity %s %s -size %dx%d caption:\"%s\" %s",
                                 color,font,orientation,strokeParam,textRegion.getWidth(), textRegion.getHeight(), text, tempFile.getPath()));
                 processBuilder.redirectErrorStream(true);
@@ -151,7 +151,7 @@ public class GeneratorThread extends Thread {
                     }
                 }
                 stringBuilder.append(tempFile.getPath());
-                ProcessBuilder processBuilder = new ProcessBuilder("magick convert " + stringBuilder);
+                ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", "magick convert " + stringBuilder);
                 processBuilder.redirectErrorStream(true);
                 Process p = processBuilder.start();
                 BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -220,7 +220,7 @@ public class GeneratorThread extends Thread {
             File generatedImage = File.createTempFile("milkshake", ".png");
             generatedImage.deleteOnExit();
             String command = "-size "+ width + "x" + height + " xc:white -font Arial" + string + " " + generatedImage.getPath();
-            ProcessBuilder processBuilder = new ProcessBuilder("magick convert " + command);
+            ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", "magick convert " + command);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
             BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
