@@ -16,7 +16,7 @@ public class ArgumentTranslator {
     private final Map<String,String> mappedArguments = new HashMap<>();
 
     public ArgumentTranslator(String rawArguments) {
-        if (!rawArguments.isEmpty() && rawArguments.contains(" ")) {
+        if (rawArguments.contains(" ")) {
             Matcher matcher = ARGUMENT_PATTERN.matcher(rawArguments);
             while (matcher.find()) {
                 if (matcher.groupCount() < 2)
@@ -101,7 +101,6 @@ public class ArgumentTranslator {
                 if (values.length >=  12) {
                     builder.setStrokeWidth(Integer.parseInt(values[6]));
                 }
-                SourceRegion region = builder.build();
                 regions.add(builder.build());
             } catch (NumberFormatException e) {
                 return Collections.emptyList();

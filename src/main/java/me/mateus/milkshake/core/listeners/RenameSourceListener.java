@@ -4,6 +4,7 @@ import me.mateus.milkshake.core.milkshake.Source;
 import me.mateus.milkshake.core.utils.StringComparator;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -62,8 +63,8 @@ public class RenameSourceListener extends ListenerAdapter {
         Source source = sources.get(idx - 1);
         try {
             BufferedImage image = ImageIO.read(new File(source.getImagePath()));
-            event.getAuthor().openPrivateChannel().queue(c -> c.sendFile(Objects.requireNonNull(bufferedImageToBytes(image)), "source.png").queue(),
-                    f -> event.getChannel().sendFile(Objects.requireNonNull(bufferedImageToBytes(image)), "source.png").queue());
+            event.getAuthor().openPrivateChannel().queue(c -> c.sendFiles(FileUpload.fromData(Objects.requireNonNull(bufferedImageToBytes(image)), "source.png")).queue(),
+                    f -> event.getChannel().sendFiles(FileUpload.fromData(Objects.requireNonNull(bufferedImageToBytes(image)), "source.png")).queue());
         } catch (IOException e) {
             e.printStackTrace();
         }

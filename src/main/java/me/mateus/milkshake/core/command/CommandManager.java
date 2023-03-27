@@ -6,10 +6,9 @@ import me.mateus.milkshake.core.command.interfaces.Command;
 import me.mateus.milkshake.core.command.translator.ArgumentTranslator;
 import me.mateus.milkshake.core.milkshake.SourceRegion;
 import me.mateus.milkshake.core.utils.StringComparator;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +58,7 @@ public class CommandManager {
                 return;
             }
         }
-        Files.write(prefixFile.toPath(), prefix.getBytes(StandardCharsets.UTF_8));
+        Files.writeString(prefixFile.toPath(), prefix);
     }
 
     public List<RegisteredCommand> getCommands() {
@@ -73,9 +72,9 @@ public class CommandManager {
                 System.err.println("ERRO AO CRIAR ARQUIVO DE PREFIX");
                 return;
             }
-            Files.write(prefixFile.toPath(), "m!".getBytes(StandardCharsets.UTF_8));
+            Files.writeString(prefixFile.toPath(), "m!");
         } else {
-            String content = new String(Files.readAllBytes(prefixFile.toPath()), StandardCharsets.UTF_8);
+            String content = Files.readString(prefixFile.toPath());
             if (!content.isEmpty()) {
                 this.prefix = content;
             }
@@ -103,7 +102,7 @@ public class CommandManager {
         if (command == null)
             return;
         User author = event.getAuthor();
-        TextChannel channel = event.getTextChannel();
+        MessageChannel channel = event.getChannel();
         if (command.isVipOnly() && !MilkshakeSimulator.VIPS.contains(author.getIdLong())) {
             channel.sendMessage("**Você não tem permissão de executar este comando**").queue();
             return;
