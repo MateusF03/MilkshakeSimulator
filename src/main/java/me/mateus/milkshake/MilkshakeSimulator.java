@@ -41,7 +41,7 @@ public class MilkshakeSimulator {
         File vipsFile = new File("vips.txt");
 
         String token = dotenv.get("MILKSHAKE_TOKEN");
-        if (token.isEmpty() || token.equals("<token>")) {
+        if (token == null || token.isEmpty() || token.equals("<token>")) {
             LOGGER.error("Não foi possível ler a variável `MILKSHAKE_TOKEN`, especifique-a na execução ou no arquivo `.env`");
             return;
         }
