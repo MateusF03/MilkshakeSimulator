@@ -16,7 +16,7 @@ RUN mv ./build/libs/*-all.jar ./build/milkshake.jar
 
 FROM base AS final
 
-RUN apk add --no-cache openjdk17
+RUN apk add --no-cache openjdk17-jre
 RUN apk add --no-cache imagemagick
 RUN apk --no-cache add msttcorefonts-installer fontconfig && \
     update-ms-fonts && \
