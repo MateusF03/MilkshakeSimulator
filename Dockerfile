@@ -16,8 +16,11 @@ RUN mv ./build/libs/*-all.jar ./build/milkshake.jar
 
 FROM base AS final
 
-RUN apk add --no-cache openjdk17-jre-headless
+RUN apk add --no-cache openjdk17
 RUN apk add --no-cache imagemagick
+RUN apk --no-cache add msttcorefonts-installer fontconfig && \
+    update-ms-fonts && \
+    fc-cache -f
 
 COPY --from=build /repo/build/milkshake.jar /usr/share
 
