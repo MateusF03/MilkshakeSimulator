@@ -40,7 +40,7 @@ public class AdminCommands {
             builder.start();
             MilkshakeSimulator.running = false;
             event.getJDA().shutdown();
-            System.exit(0);
+            System.exit(-1);
         } catch (URISyntaxException | IOException  e) {
             e.printStackTrace();
         }
