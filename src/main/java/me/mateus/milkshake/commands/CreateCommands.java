@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.imageio.ImageIO;
+
+import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -283,6 +285,24 @@ public class CreateCommands {
             event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
             event.getJDA().addEventListener(new DeleteSourceListener(event.getAuthor().getIdLong(),event.getChannel().getIdLong() , sources));
         }
+    }
+
+    @Command(name = "fontes", description = "Lista as fontes instaladas no servidor")
+    public void listAvaiableFonts(MessageReceivedEvent event, ArgumentTranslator translator) {
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setTitle("Fontes disponíveis:");
+        embedBuilder.setColor(0xb28dff);
+        StringBuilder description = new StringBuilder();
+        description.append("`");
+
+        GraphicsEnvironment graphicsEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        String[] avaiableFonts = graphicsEnv.getAvailableFontFamilyNames();
+        for (String font : avaiableFonts)
+            description.append("- ").append(font).append("\n");
+
+        description.append("`");
+        embedBuilder.setDescription(description.toString());
+        event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
     }
 
     private BufferedImage inputStreamToImage(InputStream inputStream) {
