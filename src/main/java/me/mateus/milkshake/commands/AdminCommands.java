@@ -46,17 +46,4 @@ public class AdminCommands {
         }
     }
 
-    @Command(name = "setPrefix", description = "Muda o prefixo do bot", vipOnly = true, args = {
-            @Argument(name = "newPrefix", type = ArgumentType.STRING, obligatory = true)
-    })
-    public void setPrefix(MessageReceivedEvent event, ArgumentTranslator translator) {
-        String newPrefix = translator.getAsString("newPrefix");
-        try {
-            CommandManager.getInstance().setPrefix(newPrefix);
-            event.getChannel().sendMessage("**Prefixo trocado!**").queue();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
