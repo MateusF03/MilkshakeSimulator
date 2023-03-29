@@ -18,8 +18,9 @@ FROM base AS final
 
 RUN apk add --no-cache openjdk17-jre
 RUN apk add --no-cache imagemagick
-RUN apk --no-cache add msttcorefonts-installer fontconfig && \
-    update-ms-fonts && \
+RUN apk add --no-cache font-carlito
+RUN apk add --no-cache msttcorefonts-installer fontconfig
+RUN update-ms-fonts && \
     fc-cache -f
 
 COPY --from=build /repo/build/milkshake.jar /usr/share
