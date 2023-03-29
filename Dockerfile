@@ -10,9 +10,9 @@ RUN apk add git
 
 RUN git clone --depth 1 --branch master https://github.com/GeeLeonidas/MilkshakeSimulator /repo
 WORKDIR /repo
-RUN chmod +x ./gradlew
-RUN ./gradlew build
-RUN mv ./build/libs/*-all.jar ./build/milkshake.jar
+RUN chmod +x ./gradlew && \
+    ./gradlew build && \
+    mv ./build/libs/*-all.jar ./build/milkshake.jar
 
 FROM base AS final
 
