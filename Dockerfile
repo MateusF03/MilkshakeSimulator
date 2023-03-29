@@ -5,8 +5,7 @@ RUN apk upgrade --no-cache
 
 FROM base AS build
 
-RUN apk add openjdk17-jdk
-RUN apk add git
+RUN apk add openjdk17-jdk git
 
 RUN git clone --depth 1 --branch master https://github.com/GeeLeonidas/MilkshakeSimulator /repo
 WORKDIR /repo
@@ -16,12 +15,12 @@ RUN chmod +x ./gradlew && \
 
 FROM base AS final
 
-RUN apk add --no-cache openjdk17-jre
-RUN apk add --no-cache imagemagick
-RUN apk add --no-cache font-carlito
-RUN apk add --no-cache msttcorefonts-installer fontconfig
-RUN update-ms-fonts && \
-    fc-cache -f
+RUN apk add --no-cache openjdk17-jre \
+                       imagemagick \
+                       font-carlito \
+                       msttcorefonts-installer \
+                       fontconfig
+RUN update-ms-fonts && fc-cache -f
 
 COPY --from=build /repo/build/milkshake.jar /usr/share
 
