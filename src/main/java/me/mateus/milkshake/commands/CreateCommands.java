@@ -324,7 +324,6 @@ public class CreateCommands {
             description.append(installedFonts[i]).append("\n");
 
         description.append("`");
-        System.out.println(description.toString());
         embedBuilder.setDescription(description.toString());
         embedBuilder.setFooter("Página " + page + " de " + lastPage);
         event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
