@@ -19,8 +19,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.imageio.ImageIO;
 
-import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,21 +45,20 @@ public class CreateCommands {
         MilkshakeManager manager = MilkshakeManager.getInstance();
         Template t = manager.getTemplateByName(name);
 
-        GraphicsEnvironment graphicsEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        String[] avaiableFonts = graphicsEnv.getAvailableFontFamilyNames();
+        String[] installedFonts = getInstalledFonts();
         for (SourceRegion region : regions) {
             String regionFont = region.getFont();
             if (regionFont == "")
                 continue;
             boolean isAvaiable = false;
-            for (String font : avaiableFonts) {
+            for (String font : installedFonts) {
                 if (font == regionFont) {
                     isAvaiable = true;
                     break;
                 }
             }
             if (!isAvaiable) {
-                event.getChannel().sendMessage("**Fonte **`" + regionFont + "`** não foi encontrada**").queue();
+                event.getChannel().sendMessage("**Fonte **`" + regionFont + "`** não está disponível**").queue();
                 return;
             }
         }
@@ -306,27 +305,60 @@ public class CreateCommands {
         }
     }
 
-    @Command(name = "fontes", description = "Lista as fontes instaladas no servidor")
-    public void listAvaiableFonts(MessageReceivedEvent event, ArgumentTranslator translator) {
+    @Command(name = "fontes", description = "Lista as fontes instaladas no servidor", args = {
+        @Argument(name = "page", type = ArgumentType.INTEGER, obligatory = false)
+    })
+    public void listInstalledFonts(MessageReceivedEvent event, ArgumentTranslator translator) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("Fontes disponíveis:");
         embedBuilder.setColor(0xb28dff);
         StringBuilder description = new StringBuilder();
         description.append("`");
 
-        GraphicsEnvironment graphicsEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        String[] avaiableFonts = graphicsEnv.getAvailableFontFamilyNames();
-        for (String font : avaiableFonts) {
-            description.append("- ").append(font).append("\n");
+        String[] installedFonts = getInstalledFonts();
+        int page = Math.max(translator.getAsInteger("page"), 1);
+        int lastPage = installedFonts.length / 20;
+        page = Math.min(page, lastPage);
+        int pageOverflow = (page == lastPage)? installedFonts.length % 20 : 0;
+        for (int i = 20 * (page - 1); i < 20 * page + pageOverflow; i++) {
+            String font = installedFonts[i];
+            description.append(font);
             if (font.startsWith("carlito")) {
                 int nameEndIdx = font.indexOf("-");
                 description.append("(equivalente à calibri").append(font.substring(nameEndIdx)).append(")");
             }
+            description.append("\n");
         }
 
         description.append("`");
+        System.out.println(description.toString());
         embedBuilder.setDescription(description.toString());
+        embedBuilder.setFooter("Página " + page + " de " + lastPage);
         event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
+    }
+
+    private String[] getInstalledFonts() {
+        ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "magick -list font | grep Font:");
+        try {
+            Process p = processBuilder.start();
+            BufferedReader reader = p.inputReader();
+            try {
+                p.waitFor();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            List<String> fontList = reader.lines().toList();
+            reader.close();
+
+            String[] result = new String[fontList.size()];
+            for (int i = 0; i < result.length; i++)
+                result[i] = fontList.get(i).substring(8).toLowerCase();
+            
+            return result;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     private BufferedImage inputStreamToImage(InputStream inputStream) {
