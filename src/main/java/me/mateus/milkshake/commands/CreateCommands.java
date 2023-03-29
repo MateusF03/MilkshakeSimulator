@@ -320,15 +320,8 @@ public class CreateCommands {
         int lastPage = installedFonts.length / 20;
         page = Math.min(page, lastPage);
         int pageOverflow = (page == lastPage)? installedFonts.length % 20 : 0;
-        for (int i = 20 * (page - 1); i < 20 * page + pageOverflow; i++) {
-            String font = installedFonts[i];
-            description.append(font);
-            if (font.startsWith("carlito")) {
-                int nameEndIdx = font.indexOf("-");
-                description.append("(equivalente à calibri").append(font.substring(nameEndIdx)).append(")");
-            }
-            description.append("\n");
-        }
+        for (int i = 20 * (page - 1); i < 20 * page + pageOverflow; i++)
+            description.append(installedFonts[i]).append("\n");
 
         description.append("`");
         System.out.println(description.toString());
