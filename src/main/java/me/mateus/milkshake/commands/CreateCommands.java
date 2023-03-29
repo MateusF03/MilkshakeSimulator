@@ -48,11 +48,11 @@ public class CreateCommands {
         String[] installedFonts = getInstalledFonts();
         for (SourceRegion region : regions) {
             String regionFont = region.getFont();
-            if (regionFont == "")
+            if (regionFont.equals(""))
                 continue;
             boolean isAvaiable = false;
             for (String font : installedFonts) {
-                if (font == regionFont) {
+                if (font.equals(regionFont)) {
                     isAvaiable = true;
                     break;
                 }
