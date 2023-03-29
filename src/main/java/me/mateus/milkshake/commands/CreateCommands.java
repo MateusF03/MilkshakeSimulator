@@ -45,6 +45,25 @@ public class CreateCommands {
         MilkshakeManager manager = MilkshakeManager.getInstance();
         Template t = manager.getTemplateByName(name);
 
+        GraphicsEnvironment graphicsEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        String[] avaiableFonts = graphicsEnv.getAvailableFontFamilyNames();
+        for (SourceRegion region : regions) {
+            String regionFont = region.getFont();
+            if (regionFont == "")
+                continue;
+            boolean isAvaiable = false;
+            for (String font : avaiableFonts) {
+                if (font == regionFont) {
+                    isAvaiable = true;
+                    break;
+                }
+            }
+            if (!isAvaiable) {
+                event.getChannel().sendMessage("**Fonte **`" + regionFont + "`** não foi encontrada**").queue();
+                return;
+            }
+        }
+
         if (t != null) {
             event.getChannel().sendMessage("**Já existe um template com este nome**").queue();
             return;
@@ -297,8 +316,13 @@ public class CreateCommands {
 
         GraphicsEnvironment graphicsEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
         String[] avaiableFonts = graphicsEnv.getAvailableFontFamilyNames();
-        for (String font : avaiableFonts)
+        for (String font : avaiableFonts) {
             description.append("- ").append(font).append("\n");
+            if (font.startsWith("carlito")) {
+                int nameEndIdx = font.indexOf("-");
+                description.append("(equivalente à calibri").append(font.substring(nameEndIdx)).append(")");
+            }
+        }
 
         description.append("`");
         embedBuilder.setDescription(description.toString());
