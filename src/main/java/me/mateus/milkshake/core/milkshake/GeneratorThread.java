@@ -54,6 +54,7 @@ public class GeneratorThread extends Thread {
     @Override
     public void run() {
         while (MilkshakeSimulator.running) {
+            long beginTime = System.nanoTime();
             if (milkshakes.size() < 3) {
                 MilkshakeManager manager = MilkshakeManager.getInstance();
                 int templateCount = manager.getTemplates().size();
@@ -62,8 +63,10 @@ public class GeneratorThread extends Thread {
                     addToQueue(createMilkshake(template));
                 }
             }
+            long elapsedTime = System.nanoTime() - beginTime;
+
             try {
-                Thread.sleep(200);
+                Thread.sleep(Math.max(200 - elapsedTime, 0));
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
