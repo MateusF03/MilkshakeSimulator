@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -131,7 +132,8 @@ public class GeneratorThread extends Thread {
                 if (perspectiveRegion.isText()) {
                     String text = sources.get(perspectiveRegion.getSourceName()).getText();
                     String color = perspectiveRegion.getColor().isEmpty() ? "black" : perspectiveRegion.getColor();
-                    String font = perspectiveRegion.getFont().isEmpty() ? "Arial" : perspectiveRegion.getFont();
+                    String font = perspectiveRegion.getFont().isEmpty() ? "arial" : perspectiveRegion.getFont();
+                    font = isAprilFoolsToday() ? "comic-sans-ms" : font;
                     String orientation = perspectiveRegion.getOrientation().isEmpty() ? "center" : perspectiveRegion.getOrientation();
                     String strokeParam = perspectiveRegion.getStrokeColor().isEmpty() ? "" : "-stroke " + perspectiveRegion.getStrokeColor() + " -strokewidth " + perspectiveRegion.getStrokeWidth();
                     stringBuilder.append("-background transparent -fill ").append(color).append(" -font ").append(font).append(" -gravity ").append(orientation).append(" ").append(strokeParam)
@@ -248,5 +250,10 @@ public class GeneratorThread extends Thread {
             }
         }
         return true;
+    }
+
+    private boolean isAprilFoolsToday() {
+        return Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == 1 &&
+            Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL;
     }
 }
