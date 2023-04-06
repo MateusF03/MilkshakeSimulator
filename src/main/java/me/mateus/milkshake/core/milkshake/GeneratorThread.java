@@ -64,7 +64,7 @@ public class GeneratorThread extends Thread {
                 }
             }
             long elapsedTime = (System.nanoTime() - beginTime) / 1_000_000; // Nanoseconds to Milliseconds
-
+            System.out.println(isAprilFoolsToday());
             try {
                 Thread.sleep(Math.max(200 - elapsedTime, 1));
             } catch (InterruptedException ex) {
@@ -104,7 +104,8 @@ public class GeneratorThread extends Thread {
                 tempFile.deleteOnExit();
                 String text = sources.get(textRegion.getSourceName()).getText();
                 String color = textRegion.getColor().isEmpty() ? "black" : textRegion.getColor();
-                String font = textRegion.getFont().isEmpty() ? "Arial" : textRegion.getFont();
+                String font = textRegion.getFont().isEmpty() ? "arial" : textRegion.getFont();
+                font = isAprilFoolsToday() ? "comic-sans-ms" : font;
                 String orientation = textRegion.getOrientation().isEmpty() ? "center" : textRegion.getOrientation();
                 String strokeParam = textRegion.getStrokeColor().isEmpty() ? "" : "-stroke " + textRegion.getStrokeColor() + " -strokewidth " + textRegion.getStrokeWidth();
                 ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "magick convert " +
@@ -252,7 +253,7 @@ public class GeneratorThread extends Thread {
     }
 
     private boolean isAprilFoolsToday() {
-        return Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == 5 &&
+        return Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == 6 &&
             Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL;
     }
 }
