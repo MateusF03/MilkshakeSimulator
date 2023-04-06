@@ -252,7 +252,7 @@ public class GeneratorThread extends Thread {
     }
 
     private boolean isAprilFoolsToday() {
-        return Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == 1 &&
+        return Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == 5 &&
             Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL;
     }
 }
