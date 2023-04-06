@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,10 +63,10 @@ public class GeneratorThread extends Thread {
                     addToQueue(createMilkshake(template));
                 }
             }
-            long elapsedTime = System.nanoTime() - beginTime;
+            long elapsedTime = (System.nanoTime() - beginTime) / 1_000_000; // Nanoseconds to Milliseconds
 
             try {
-                Thread.sleep(Math.max(200 - elapsedTime, 0));
+                Thread.sleep(Math.max(200 - elapsedTime, 1));
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
