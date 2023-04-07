@@ -6,10 +6,9 @@ import me.mateus.milkshake.core.command.interfaces.Command;
 import me.mateus.milkshake.core.command.translator.ArgumentTranslator;
 import me.mateus.milkshake.core.milkshake.SourceRegion;
 import me.mateus.milkshake.core.utils.StringComparator;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.cdimascio.dotenv.Dotenv;
 public class CommandManager {
 
     private CommandManager() {}
@@ -59,27 +60,19 @@ public class CommandManager {
                 return;
             }
         }
-        Files.write(prefixFile.toPath(), prefix.getBytes(StandardCharsets.UTF_8));
+        Files.writeString(prefixFile.toPath(), prefix);
     }
 
     public List<RegisteredCommand> getCommands() {
         return commands;
     }
 
-    public void setupPrefix() throws IOException {
-        File prefixFile = new File("prefix.txt");
-        if (!prefixFile.exists()) {
-            if (!prefixFile.createNewFile()) {
-                System.err.println("ERRO AO CRIAR ARQUIVO DE PREFIX");
-                return;
-            }
-            Files.write(prefixFile.toPath(), "m!".getBytes(StandardCharsets.UTF_8));
-        } else {
-            String content = new String(Files.readAllBytes(prefixFile.toPath()), StandardCharsets.UTF_8);
-            if (!content.isEmpty()) {
-                this.prefix = content;
-            }
-        }
+    public void setupPrefix(Dotenv dotenv) throws IOException {
+        String givenPrefix = dotenv.get("MILKSHAKE_PREFIX", "");
+        if (givenPrefix.isEmpty() || givenPrefix.equals("<prefix>"))
+            this.prefix = "m!";
+        else
+            this.prefix = givenPrefix;
     }
 
 
@@ -103,7 +96,7 @@ public class CommandManager {
         if (command == null)
             return;
         User author = event.getAuthor();
-        TextChannel channel = event.getTextChannel();
+        MessageChannel channel = event.getChannel();
         if (command.isVipOnly() && !MilkshakeSimulator.VIPS.contains(author.getIdLong())) {
             channel.sendMessage("**Você não tem permissão de executar este comando**").queue();
             return;
