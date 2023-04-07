@@ -7,7 +7,7 @@ FROM base AS build
 
 RUN apk add openjdk17-jdk git
 
-RUN git clone --depth 1 --branch master https://github.com/GeeLeonidas/MilkshakeSimulator /repo
+RUN git clone --depth 1 --branch master https://github.com/MateusF03/MilkshakeSimulator /repo
 WORKDIR /repo
 RUN chmod +x ./gradlew && \
     ./gradlew build && \
