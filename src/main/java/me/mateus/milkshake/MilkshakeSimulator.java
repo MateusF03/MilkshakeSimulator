@@ -13,11 +13,15 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,16 +33,16 @@ public class MilkshakeSimulator {
     public static boolean running = true;
 
     public static void main(String[] args) throws IOException, LoginException {
-        File tokenFile = new File("token.txt");
+        if (!Files.exists(Path.of(".env")))
+            Files.createFile(Path.of(".env"));
+
+        Dotenv dotenv = Dotenv.load();
+
         File vipsFile = new File("vips.txt");
 
-        if (!tokenFile.exists()) {
-            LOGGER.info("Não foi possível encontrar o arquivo de token, irei tentar criar ele...");
-            if (!tokenFile.createNewFile()) {
-                LOGGER.error("Não consegui criar o arquivo de token");
-                return;
-            }
-            LOGGER.info("Arquivo de token criado com sucesso! Escreva o token dentro dele.");
+        String token = dotenv.get("MILKSHAKE_TOKEN", "");
+        if (token.isEmpty() || token.equals("<token>")) {
+            LOGGER.error("Não foi possível ler a variável `MILKSHAKE_TOKEN`, especifique-a na execução ou no arquivo `.env`");
             return;
         }
         if (vipsFile.exists()) {
@@ -46,14 +50,8 @@ public class MilkshakeSimulator {
             lines.forEach(l -> VIPS.add(Long.parseLong(l)));
         }
 
-        byte[] bytes = Files.readAllBytes(tokenFile.toPath());
-        String token = new String(bytes, StandardCharsets.UTF_8);
-        if (token.isEmpty()) {
-            LOGGER.info("O arquivo de token está vazio");
-            return;
-        }
         CommandManager manager = CommandManager.getInstance();
-        manager.setupPrefix();
+        manager.setupPrefix(dotenv);
         manager.registerCommands(new SayCommand());
         MilkshakeManager.getInstance().setupMilkshakes();
         manager.registerCommands(new GenerateCommand());

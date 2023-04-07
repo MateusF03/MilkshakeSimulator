@@ -40,21 +40,8 @@ public class AdminCommands {
             builder.start();
             MilkshakeSimulator.running = false;
             event.getJDA().shutdown();
-            System.exit(0);
+            System.exit(-1);
         } catch (URISyntaxException | IOException  e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Command(name = "setPrefix", description = "Muda o prefixo do bot", vipOnly = true, args = {
-            @Argument(name = "newPrefix", type = ArgumentType.STRING, obligatory = true)
-    })
-    public void setPrefix(MessageReceivedEvent event, ArgumentTranslator translator) {
-        String newPrefix = translator.getAsString("newPrefix");
-        try {
-            CommandManager.getInstance().setPrefix(newPrefix);
-            event.getChannel().sendMessage("**Prefixo trocado!**").queue();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -42,8 +42,11 @@ public class GeneratorThread extends Thread {
         Milkshake milkshake = milkshakes.poll();
         if (milkshake == null ) {
             MilkshakeManager manager = MilkshakeManager.getInstance();
-            Template template = manager.getTemplates().get(random.nextInt(manager.getTemplates().size()));
-            return createMilkshake(template);
+            int templateCount = manager.getTemplates().size();
+            if (templateCount > 0) {
+                Template template = manager.getTemplates().get(random.nextInt(manager.getTemplates().size()));
+                return createMilkshake(template);
+            }
         }
         return milkshake;
     }
@@ -51,6 +54,7 @@ public class GeneratorThread extends Thread {
     @Override
     public void run() {
         while (MilkshakeSimulator.running) {
+            long beginTime = System.nanoTime();
             if (milkshakes.size() < 3) {
                 MilkshakeManager manager = MilkshakeManager.getInstance();
                 int templateCount = manager.getTemplates().size();
@@ -58,6 +62,13 @@ public class GeneratorThread extends Thread {
                     Template template = manager.getTemplates().get(random.nextInt(templateCount));
                     addToQueue(createMilkshake(template));
                 }
+            }
+            long elapsedTime = (System.nanoTime() - beginTime) / 1_000_000; // Nanoseconds to Milliseconds
+            System.out.println(isAprilFoolsToday());
+            try {
+                Thread.sleep(Math.max(200 - elapsedTime, 1));
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
             }
         }
     }
@@ -93,10 +104,11 @@ public class GeneratorThread extends Thread {
                 tempFile.deleteOnExit();
                 String text = sources.get(textRegion.getSourceName()).getText();
                 String color = textRegion.getColor().isEmpty() ? "black" : textRegion.getColor();
-                String font = textRegion.getFont().isEmpty() ? "Arial" : textRegion.getFont();
+                String font = textRegion.getFont().isEmpty() ? "arial" : textRegion.getFont();
+                font = isAprilFoolsToday() ? "comic-sans-ms" : font;
                 String orientation = textRegion.getOrientation().isEmpty() ? "center" : textRegion.getOrientation();
                 String strokeParam = textRegion.getStrokeColor().isEmpty() ? "" : "-stroke " + textRegion.getStrokeColor() + " -strokewidth " + textRegion.getStrokeWidth();
-                ProcessBuilder processBuilder = new ProcessBuilder("magick convert " +
+                ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "magick convert " +
                         String.format("-background transparent -fill %s -font %s -gravity %s %s -size %dx%d caption:\"%s\" %s",
                                 color,font,orientation,strokeParam,textRegion.getWidth(), textRegion.getHeight(), text, tempFile.getPath()));
                 processBuilder.redirectErrorStream(true);
@@ -120,7 +132,8 @@ public class GeneratorThread extends Thread {
                 if (perspectiveRegion.isText()) {
                     String text = sources.get(perspectiveRegion.getSourceName()).getText();
                     String color = perspectiveRegion.getColor().isEmpty() ? "black" : perspectiveRegion.getColor();
-                    String font = perspectiveRegion.getFont().isEmpty() ? "Arial" : perspectiveRegion.getFont();
+                    String font = perspectiveRegion.getFont().isEmpty() ? "arial" : perspectiveRegion.getFont();
+                    font = isAprilFoolsToday() ? "comic-sans-ms" : font;
                     String orientation = perspectiveRegion.getOrientation().isEmpty() ? "center" : perspectiveRegion.getOrientation();
                     String strokeParam = perspectiveRegion.getStrokeColor().isEmpty() ? "" : "-stroke " + perspectiveRegion.getStrokeColor() + " -strokewidth " + perspectiveRegion.getStrokeWidth();
                     stringBuilder.append("-background transparent -fill ").append(color).append(" -font ").append(font).append(" -gravity ").append(orientation).append(" ").append(strokeParam)
@@ -143,7 +156,7 @@ public class GeneratorThread extends Thread {
                     }
                 }
                 stringBuilder.append(tempFile.getPath());
-                ProcessBuilder processBuilder = new ProcessBuilder("magick convert " + stringBuilder);
+                ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "magick convert " + stringBuilder);
                 processBuilder.redirectErrorStream(true);
                 Process p = processBuilder.start();
                 BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -212,7 +225,7 @@ public class GeneratorThread extends Thread {
             File generatedImage = File.createTempFile("milkshake", ".png");
             generatedImage.deleteOnExit();
             String command = "-size "+ width + "x" + height + " xc:white -font Arial" + string + " " + generatedImage.getPath();
-            ProcessBuilder processBuilder = new ProcessBuilder("magick convert " + command);
+            ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "magick convert " + command);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
             BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -237,5 +250,10 @@ public class GeneratorThread extends Thread {
             }
         }
         return true;
+    }
+
+    private boolean isAprilFoolsToday() {
+        return Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == 1 &&
+            Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL;
     }
 }
