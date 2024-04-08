@@ -39,8 +39,8 @@
           LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath buildInputs}";
         in {
           packages = rec {
-            default = MilkshakeSimulator;
-            MilkshakeSimulator = buildGradle {
+            default = javaProgram;
+            javaProgram = buildGradle {
               inherit nativeBuildInputs buildInputs LD_LIBRARY_PATH;
 
               envSpec = ./nix/gradle-env.json;
@@ -68,7 +68,7 @@
               '';
 
               passthru = {
-                plugin = "${MilkshakeSimulator}/share/plugin.jar";
+                plugin = "${javaProgram}/share/plugin.jar";
               };
             };
             dockerImage = pkgs.dockerTools.buildLayeredImage {
