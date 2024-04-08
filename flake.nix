@@ -27,7 +27,7 @@
           ];
           # Add run-time dependencies
           buildInputs = with pkgs; [
-            jre17
+            # ...
           ];
           # Define Gradle build
           buildGradle = pkgs.callPackage ./nix/gradle-env.nix { gradleBuildJdk = pkgs.jdk17; };
