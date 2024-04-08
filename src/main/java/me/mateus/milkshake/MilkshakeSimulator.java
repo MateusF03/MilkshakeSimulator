@@ -22,9 +22,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Arrays;
 
 public class MilkshakeSimulator {
 
@@ -44,6 +46,8 @@ public class MilkshakeSimulator {
         String token = dotenv.get("MILKSHAKE_TOKEN", "");
         if (token.isEmpty() || token.equals("<token>")) {
             LOGGER.error("Não foi possível ler a variável `MILKSHAKE_TOKEN`, especifique-a na execução ou no arquivo `.env`");
+            String[] lines = {"MILKSHAKE_TOKEN=<token>", "MILKSHAKE_PREFIX=<prefix>"};
+            Files.write(of, Arrays.asList(lines), StandardOpenOption.TRUNCATE_EXISTING);
             return;
         }
         if (vipsFile.exists()) {
