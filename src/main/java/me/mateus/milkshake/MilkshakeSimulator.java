@@ -33,8 +33,9 @@ public class MilkshakeSimulator {
     public static boolean running = true;
 
     public static void main(String[] args) throws IOException, LoginException {
-        if (!Files.exists(Path.of(".env")))
-            Files.createFile(Path.of(".env"));
+        Path of = Path.of(".env");
+        if (!Files.exists(of))
+            Files.createFile(of);
 
         Dotenv dotenv = Dotenv.load();
 

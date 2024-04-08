@@ -29,7 +29,7 @@ public class Source {
         this.name = name;
         File file = new File(filePath);
         String json = MilkshakeManager.GSON.toJson(this);
-        Files.write(file.toPath(),json.getBytes(StandardCharsets.UTF_8));
+        Files.writeString(file.toPath(), json);
     }
 
     public boolean errorWhileDeleting() {

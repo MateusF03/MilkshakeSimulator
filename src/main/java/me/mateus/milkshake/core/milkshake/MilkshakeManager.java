@@ -70,7 +70,7 @@ public class MilkshakeManager {
                 } else {
                     String extension = getFileExtension(file);
                     if (extension.equals(".milkshake")) {
-                        String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+                        String content = Files.readString(file.toPath());
                         JsonObject jsonObject = JsonParser.parseString(content).getAsJsonObject();
                         Template template = new Template(jsonObject);
                         template.setOriginalFilePath(file.getPath());

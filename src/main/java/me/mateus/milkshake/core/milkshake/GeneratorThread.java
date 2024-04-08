@@ -17,10 +17,10 @@ public class GeneratorThread extends Thread {
 
     public GeneratorThread() {
         this.milkshakes = new LinkedList<>();
-        originalPoints.put(0,"0,0");
-        originalPoints.put(1,"0,%height%");
-        originalPoints.put(2,"%width%,0");
-        originalPoints.put(3,"%width%,%height%");
+        originalPoints.put(0, "0,0");
+        originalPoints.put(1, "0,%height%");
+        originalPoints.put(2, "%width%,0");
+        originalPoints.put(3, "%width%,%height%");
     }
 
     public void addToQueue(Milkshake milkshake) {
@@ -40,7 +40,7 @@ public class GeneratorThread extends Thread {
 
     public Milkshake getMilkshake() {
         Milkshake milkshake = milkshakes.poll();
-        if (milkshake == null ) {
+        if (milkshake == null) {
             MilkshakeManager manager = MilkshakeManager.getInstance();
             int templateCount = manager.getTemplates().size();
             if (templateCount > 0) {
@@ -54,21 +54,20 @@ public class GeneratorThread extends Thread {
     @Override
     public void run() {
         while (MilkshakeSimulator.running) {
+            MilkshakeManager manager = MilkshakeManager.getInstance();
+            List<Template> templates = manager.getTemplates();
+            int templateCount = templates.size();
+
             long beginTime = System.nanoTime();
-            if (milkshakes.size() < 3) {
-                MilkshakeManager manager = MilkshakeManager.getInstance();
-                int templateCount = manager.getTemplates().size();
-                if (templateCount > 0) {
-                    Template template = manager.getTemplates().get(random.nextInt(templateCount));
-                    addToQueue(createMilkshake(template));
-                }
+            if (milkshakes.size() < 3 && templateCount > 0) {
+                Template template = templates.get(random.nextInt(templateCount));
+                addToQueue(createMilkshake(template));
             }
             long elapsedTime = (System.nanoTime() - beginTime) / 1_000_000; // Nanoseconds to Milliseconds
-            System.out.println(isAprilFoolsToday());
             try {
                 Thread.sleep(Math.max(200 - elapsedTime, 1));
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                throw new RuntimeException(ex);
             }
         }
     }
@@ -94,23 +93,28 @@ public class GeneratorThread extends Thread {
             sources.put(sourceIdx, source);
         }
 
-        List<SourceRegion> perspectiveRegions = sourceRegions.stream().filter(this::isPoints).collect(Collectors.toList());
-        List<SourceRegion> textRegions = sourceRegions.stream().filter(r -> r.isText() && !isPoints(r)).collect(Collectors.toList());
+        List<SourceRegion> perspectiveRegions = sourceRegions.stream().filter(this::isPoints)
+                .collect(Collectors.toList());
+        List<SourceRegion> textRegions = sourceRegions.stream().filter(r -> r.isText() && !isPoints(r))
+                .collect(Collectors.toList());
         Map<String, File> textBoxesFile = new HashMap<>();
         Map<String, File> perspectivesFile = new HashMap<>();
         for (SourceRegion textRegion : textRegions) {
             try {
-                File tempFile = File.createTempFile("text",".png");
+                File tempFile = File.createTempFile("text", ".png");
                 tempFile.deleteOnExit();
                 String text = sources.get(textRegion.getSourceName()).getText();
                 String color = textRegion.getColor().isEmpty() ? "black" : textRegion.getColor();
                 String font = textRegion.getFont().isEmpty() ? "arial" : textRegion.getFont();
                 font = isAprilFoolsToday() ? "comic-sans-ms" : font;
                 String orientation = textRegion.getOrientation().isEmpty() ? "center" : textRegion.getOrientation();
-                String strokeParam = textRegion.getStrokeColor().isEmpty() ? "" : "-stroke " + textRegion.getStrokeColor() + " -strokewidth " + textRegion.getStrokeWidth();
+                String strokeParam = textRegion.getStrokeColor().isEmpty() ? ""
+                        : "-stroke " + textRegion.getStrokeColor() + " -strokewidth " + textRegion.getStrokeWidth();
                 ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "magick convert " +
-                        String.format("-background transparent -fill %s -font %s -gravity %s %s -size %dx%d caption:\"%s\" %s",
-                                color,font,orientation,strokeParam,textRegion.getWidth(), textRegion.getHeight(), text, tempFile.getPath()));
+                        String.format(
+                                "-background transparent -fill %s -font %s -gravity %s %s -size %dx%d caption:\"%s\" %s",
+                                color, font, orientation, strokeParam, textRegion.getWidth(), textRegion.getHeight(),
+                                text, tempFile.getPath()));
                 processBuilder.redirectErrorStream(true);
                 Process p = processBuilder.start();
                 BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -134,13 +138,19 @@ public class GeneratorThread extends Thread {
                     String color = perspectiveRegion.getColor().isEmpty() ? "black" : perspectiveRegion.getColor();
                     String font = perspectiveRegion.getFont().isEmpty() ? "arial" : perspectiveRegion.getFont();
                     font = isAprilFoolsToday() ? "comic-sans-ms" : font;
-                    String orientation = perspectiveRegion.getOrientation().isEmpty() ? "center" : perspectiveRegion.getOrientation();
-                    String strokeParam = perspectiveRegion.getStrokeColor().isEmpty() ? "" : "-stroke " + perspectiveRegion.getStrokeColor() + " -strokewidth " + perspectiveRegion.getStrokeWidth();
-                    stringBuilder.append("-background transparent -fill ").append(color).append(" -font ").append(font).append(" -gravity ").append(orientation).append(" ").append(strokeParam)
-                            .append(" -size ").append(width).append('x').append(height).append(" caption:\"").append(text).append("\" ");
+                    String orientation = perspectiveRegion.getOrientation().isEmpty() ? "center"
+                            : perspectiveRegion.getOrientation();
+                    String strokeParam = perspectiveRegion.getStrokeColor().isEmpty() ? ""
+                            : "-stroke " + perspectiveRegion.getStrokeColor() + " -strokewidth "
+                                    + perspectiveRegion.getStrokeWidth();
+                    stringBuilder.append("-background transparent -fill ").append(color).append(" -font ").append(font)
+                            .append(" -gravity ").append(orientation).append(" ").append(strokeParam)
+                            .append(" -size ").append(width).append('x').append(height).append(" caption:\"")
+                            .append(text).append("\" ");
                 } else {
                     String imagePath = sources.get(perspectiveRegion.getSourceName()).getImagePath();
-                    stringBuilder.append(imagePath).append(" -resize ").append(width).append("x").append(height).append("! -matte -virtual-pixel transparent ");
+                    stringBuilder.append(imagePath).append(" -resize ").append(width).append("x").append(height)
+                            .append("! -matte -virtual-pixel transparent ");
                 }
 
                 stringBuilder.append("-distort Perspective \"");
@@ -178,45 +188,54 @@ public class GeneratorThread extends Thread {
                 int y = s.getPoints()[3].getY();
                 File file = perspectivesFile.get(x + "%" + y);
                 stringBuilder.append(" -draw \"image over ").append(0).append(",").append(0).append(" ")
-                        .append(template.getWidth()).append(",").append(template.getHeight()).append(" '").append(file.getPath()).append("'\"");
+                        .append(template.getWidth()).append(",").append(template.getHeight()).append(" '")
+                        .append(file.getPath()).append("'\"");
             } else if (s.isText()) {
 
                 File file = textBoxesFile.get(s.getX() + ":" + s.getY());
                 if (file == null) {
                     System.out.println("NULL");
                 } else {
-                    stringBuilder.append(" -draw \"image over ").append(s.getX()).append(",").append(s.getY()).append(" ")
-                            .append(s.getWidth()).append(",").append(s.getHeight()).append(" '").append(file.getPath()).append("'\"");
+                    stringBuilder.append(" -draw \"image over ").append(s.getX()).append(",").append(s.getY())
+                            .append(" ")
+                            .append(s.getWidth()).append(",").append(s.getHeight()).append(" '").append(file.getPath())
+                            .append("'\"");
                 }
             } else {
                 Source source = sources.get(s.getSourceName());
 
                 stringBuilder.append(" -draw \"image over ").append(s.getX()).append(",").append(s.getY()).append(" ")
-                        .append(s.getWidth()).append(",").append(s.getHeight()).append(" '").append(source.getImagePath()).append("'\"");
+                        .append(s.getWidth()).append(",").append(s.getHeight()).append(" '")
+                        .append(source.getImagePath()).append("'\"");
             }
         });
         stringBuilder.append(" -draw \"image over ").append(0).append(",").append(0).append(" ")
-                .append(template.getWidth()).append(",").append(template.getHeight()).append(" '").append(template.getImagePath()).append("'\"");
+                .append(template.getWidth()).append(",").append(template.getHeight()).append(" '")
+                .append(template.getImagePath()).append("'\"");
         sourceRegions.stream().filter(s -> s.getPriority() >= 0).forEach(s -> {
             if (isPoints(s)) {
                 int x = s.getPoints()[0].getX();
                 int y = s.getPoints()[3].getY();
                 File file = perspectivesFile.get(x + "%" + y);
                 stringBuilder.append(" -draw \"image over ").append(0).append(",").append(0).append(" ")
-                        .append(template.getWidth()).append(",").append(template.getHeight()).append(" '").append(file.getPath()).append("'\"");
+                        .append(template.getWidth()).append(",").append(template.getHeight()).append(" '")
+                        .append(file.getPath()).append("'\"");
             } else if (s.isText()) {
                 File file = textBoxesFile.get(s.getX() + ":" + s.getY());
                 if (file == null) {
                     System.out.println("NULL");
                 } else {
-                    stringBuilder.append(" -draw \"image over ").append(s.getX()).append(",").append(s.getY()).append(" ")
-                            .append(s.getWidth()).append(",").append(s.getHeight()).append(" '").append(file.getPath()).append("'\"");
+                    stringBuilder.append(" -draw \"image over ").append(s.getX()).append(",").append(s.getY())
+                            .append(" ")
+                            .append(s.getWidth()).append(",").append(s.getHeight()).append(" '").append(file.getPath())
+                            .append("'\"");
                 }
             } else {
                 Source source = sources.get(s.getSourceName());
 
                 stringBuilder.append(" -draw \"image over ").append(s.getX()).append(",").append(s.getY()).append(" ")
-                        .append(s.getWidth()).append(",").append(s.getHeight()).append(" '").append(source.getImagePath()).append("'\"");
+                        .append(s.getWidth()).append(",").append(s.getHeight()).append(" '")
+                        .append(source.getImagePath()).append("'\"");
             }
         });
         String string = stringBuilder.toString();
@@ -224,7 +243,8 @@ public class GeneratorThread extends Thread {
         try {
             File generatedImage = File.createTempFile("milkshake", ".png");
             generatedImage.deleteOnExit();
-            String command = "-size "+ width + "x" + height + " xc:white -font Arial" + string + " " + generatedImage.getPath();
+            String command = "-size " + width + "x" + height + " xc:white -font Arial" + string + " "
+                    + generatedImage.getPath();
             ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "magick convert " + command);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
@@ -254,6 +274,6 @@ public class GeneratorThread extends Thread {
 
     private boolean isAprilFoolsToday() {
         return Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == 1 &&
-            Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL;
+                Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL;
     }
 }
