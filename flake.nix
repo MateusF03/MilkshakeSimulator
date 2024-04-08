@@ -60,8 +60,6 @@
                 };
               };
 
-              gradleFlags = [ "shadowJar" ];
-
               installPhase = ''
                 mkdir -p $out
                 cp -r ./build/libs/${pname}*.jar $out/
