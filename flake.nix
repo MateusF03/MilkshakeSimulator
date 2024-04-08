@@ -72,7 +72,7 @@
               };
             };
             dockerImage = pkgs.dockerTools.buildLayeredImage {
-              name = "MilkshakeSimulator";
+              name = pname;
               tag = "head";
               contents = [ default ];
             };
