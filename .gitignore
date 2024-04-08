@@ -5,5 +5,12 @@ build
 
 prefix.txt
 token.txt
+vips.txt
 texts.json
 .env
+sources
+templates
+images
+
+result
+.direnv
