@@ -27,7 +27,7 @@
           ];
           # Add run-time dependencies
           buildInputs = with pkgs; [
-            jre17_minimal
+            temurin-jre-bin-17
             corefonts
             vistafonts
             fontconfig
