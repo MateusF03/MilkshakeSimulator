@@ -27,6 +27,7 @@
           ];
           # Add run-time dependencies
           buildInputs = with pkgs; [
+            jre17_minimal
             corefonts
             vistafonts
             fontconfig
@@ -40,6 +41,8 @@
           packages = rec {
             default = MilkshakeSimulator;
             MilkshakeSimulator = buildGradle {
+              inherit nativeBuildInputs buildInputs LD_LIBRARY_PATH;
+
               envSpec = ./nix/gradle-env.json;
               
               src = with pkgs; lib.cleanSourceWith {
