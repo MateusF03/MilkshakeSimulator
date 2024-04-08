@@ -27,7 +27,10 @@
           ];
           # Add run-time dependencies
           buildInputs = with pkgs; [
-            # ...
+            corefonts
+            vistafonts
+            fontconfig
+            imagemagick
           ];
           # Define Gradle build
           buildGradle = pkgs.callPackage ./nix/gradle-env.nix { gradleBuildJdk = pkgs.jdk17; };
