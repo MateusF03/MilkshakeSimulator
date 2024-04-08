@@ -54,11 +54,11 @@
                 };
               };
 
-              gradleFlags = [ "installDist" ];
+              gradleFlags = [ "shadowJar" ];
 
               installPhase = ''
                 mkdir -p $out
-                cp -r app/build/install/${pname}/* $out/
+                cp -r ./build/libs/${pname}*.jar $out/
               '';
 
               passthru = {
