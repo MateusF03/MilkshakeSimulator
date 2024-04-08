@@ -30,7 +30,6 @@
             temurin-jre-bin-17
             corefonts
             vistafonts
-            fontconfig
             imagemagick
           ];
           # Define Gradle build
