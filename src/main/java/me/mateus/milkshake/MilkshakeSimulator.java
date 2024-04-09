@@ -6,10 +6,13 @@ import me.mateus.milkshake.commands.GenerateCommand;
 import me.mateus.milkshake.commands.SayCommand;
 import me.mateus.milkshake.core.command.CommandListener;
 import me.mateus.milkshake.core.command.CommandManager;
+import me.mateus.milkshake.core.command.RegisteredCommand;
 import me.mateus.milkshake.core.milkshake.MilkshakeManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,5 +68,11 @@ public class MilkshakeSimulator {
         manager.registerCommands(new GenerateCommand());
         manager.registerCommands(new CreateCommands());
         manager.registerCommands(new AdminCommands());
+
+        CommandListUpdateAction slashCommands = jda.updateCommands();
+        for (RegisteredCommand command : manager.getCommands()) {
+            slashCommands.addCommands(command.toSlashCommand());
+        }
+        slashCommands.queue();
     }
 }

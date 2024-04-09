@@ -3,7 +3,12 @@ package me.mateus.milkshake.core.command;
 import me.mateus.milkshake.core.command.interfaces.Argument;
 import me.mateus.milkshake.core.command.interfaces.Command;
 import me.mateus.milkshake.core.command.translator.ArgumentTranslator;
+import me.mateus.milkshake.core.utils.Casing;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -61,5 +66,32 @@ public class RegisteredCommand {
             }
         }
         return stringBuilder.substring(0, stringBuilder.length() - 1);
+    }
+
+    public SlashCommandData toSlashCommand() {
+        String validCommandName =
+            Casing.squash(Casing.fromCamelCase(this.name));
+        SlashCommandData result = Commands.slash(validCommandName, this.description).setGuildOnly(true);
+        for (Argument argument : arguments) {
+            OptionType type = OptionType.STRING;
+            switch (argument.type()) {
+                case INTEGER:
+                    type = OptionType.INTEGER;
+                case BOOLEAN:
+                    type = OptionType.BOOLEAN;
+                default:
+                    break;
+            }
+            String validArgumentName =
+                Casing.toSnakeCase(Casing.fromCamelCase(argument.name()));
+            String validDescription = argument.type().getUsage();
+            if (validDescription.length() > 100)
+                validDescription = validDescription.substring(0, 99) + "…";
+            result = result.addOptions(
+                new OptionData(type, validArgumentName, validDescription)
+                    .setRequired(argument.obligatory())
+            );
+        }
+        return result;
     }
 }
