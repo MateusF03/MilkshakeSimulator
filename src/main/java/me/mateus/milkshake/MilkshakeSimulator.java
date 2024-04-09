@@ -53,6 +53,11 @@ public class MilkshakeSimulator {
             lines.forEach(l -> VIPS.add(Long.parseLong(l)));
         }
 
+        JDA jda = JDABuilder.createDefault(token)
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
+                .addEventListeners(new CommandListener())
+                .build();
+
         CommandManager manager = CommandManager.getInstance();
         manager.setupPrefix(dotenv);
         manager.registerCommands(new SayCommand());
@@ -60,9 +65,5 @@ public class MilkshakeSimulator {
         manager.registerCommands(new GenerateCommand());
         manager.registerCommands(new CreateCommands());
         manager.registerCommands(new AdminCommands());
-        JDA jda = JDABuilder.createDefault(token)
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
-                .addEventListeners(new CommandListener())
-                .build();
     }
 }
