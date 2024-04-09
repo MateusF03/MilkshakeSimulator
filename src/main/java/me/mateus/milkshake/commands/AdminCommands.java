@@ -1,9 +1,6 @@
 package me.mateus.milkshake.commands;
 
 import me.mateus.milkshake.MilkshakeSimulator;
-import me.mateus.milkshake.core.command.ArgumentType;
-import me.mateus.milkshake.core.command.CommandManager;
-import me.mateus.milkshake.core.command.interfaces.Argument;
 import me.mateus.milkshake.core.command.interfaces.Command;
 import me.mateus.milkshake.core.command.translator.ArgumentTranslator;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
