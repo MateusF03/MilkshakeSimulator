@@ -40,21 +40,23 @@ public final class CommandEnvironment {
     }
 
     public BufferedImage getAttatchedImage() {
+        InputStream stream = null;
+
         if (this.event instanceof MessageReceivedEvent) {
             MessageReceivedEvent realEvent =
                 (MessageReceivedEvent) this.event;
             Message message = realEvent.getMessage();
-            InputStream stream = getInputStreamFromMessage(message);
-            return inputStreamToImage(stream);
+            stream = getInputStreamFromMessage(message);
         } else if (this.event instanceof SlashCommandInteractionEvent) {
             SlashCommandInteractionEvent realEvent =
                 (SlashCommandInteractionEvent) this.event;
             Attachment attachment = realEvent.getOption("image").getAsAttachment();
-            InputStream stream = getInputStreamFromAttatchment(attachment);
-            return inputStreamToImage(stream);
+            stream = getInputStreamFromAttatchment(attachment);
         } else {
             throw new NotImplementedError(this.event + " is not being handled by `CommandEnvironment`");
         }
+
+        return inputStreamToImage(stream);
     }
 
     private BufferedImage inputStreamToImage(InputStream inputStream) {
