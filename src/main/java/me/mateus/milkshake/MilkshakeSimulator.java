@@ -70,9 +70,8 @@ public class MilkshakeSimulator {
         manager.registerCommands(new AdminCommands());
 
         CommandListUpdateAction slashCommands = jda.updateCommands();
-        for (RegisteredCommand command : manager.getCommands()) {
+        for (RegisteredCommand command : manager.getCommands())
             slashCommands.addCommands(command.toSlashCommand());
-        }
         slashCommands.queue();
     }
 }
