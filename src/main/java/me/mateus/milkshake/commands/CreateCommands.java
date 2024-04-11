@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException;
 
 public class CreateCommands {
 
-    @Command(name = "create", description = "Cria um template", args = {
+    @Command(name = "create", description = "Cria um template", receivesImage = true, args = {
             @Argument(name = "name", type = ArgumentType.STRING, obligatory = true),
             @Argument(name = "regions", type = ArgumentType.REGIONS, obligatory = true)
     })
@@ -148,7 +148,7 @@ public class CreateCommands {
         }
     }
 
-    @Command(name = "source", description = "Cria uma source", args = {
+    @Command(name = "source", description = "Cria uma source", receivesImage = true, args = {
             @Argument(name = "name", type = ArgumentType.STRING, obligatory = true)
     })
     public void source(MessageReceivedEvent event, ArgumentTranslator translator) {

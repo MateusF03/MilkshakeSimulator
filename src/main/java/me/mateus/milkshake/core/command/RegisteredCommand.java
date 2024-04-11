@@ -18,6 +18,7 @@ public class RegisteredCommand {
     private final String name;
     private final String description;
     private final boolean vipOnly;
+    private final boolean receivesImage;
     private final Argument[] arguments;
     private final Method method;
     private final Object object;
@@ -26,6 +27,7 @@ public class RegisteredCommand {
         this.name = annotation.name();
         this.description = annotation.description();
         this.vipOnly = annotation.vipOnly();
+        this.receivesImage = annotation.receivesImage();
         this.arguments = annotation.args();
         this.method = method;
         this.object = object;
@@ -92,6 +94,10 @@ public class RegisteredCommand {
                     .setRequired(argument.obligatory())
             );
         }
+        if (this.receivesImage)
+            result = result.addOptions(
+                new OptionData(OptionType.ATTACHMENT, "image", "imagem")
+            );
         return result;
     }
 }
