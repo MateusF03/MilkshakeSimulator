@@ -12,36 +12,34 @@ import javax.management.InvalidAttributeValueException;
 
 import org.jetbrains.annotations.Nullable;
 
-import kotlin.NotImplementedError;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 public final class CommandEnvironment {
-    private Event event;
+    private Pair<MessageReceivedEvent, SlashCommandInteractionEvent> event;
     
     public CommandEnvironment(MessageReceivedEvent event) {
-        this.event = event;
+        this.event = Pair.of(event, null);
+    }
+
+    public CommandEnvironment(SlashCommandInteractionEvent event) {
+        this.event = Pair.of(null, event);
     }
 
     public void reply(String replyContent, @Nullable Consumer<Pair<Message, InteractionHook>> success) {
-        if (this.event instanceof MessageReceivedEvent) {
-            MessageReceivedEvent realEvent =
-                (MessageReceivedEvent) this.event;
+        if (this.event.getRight() == null) {
+            MessageReceivedEvent realEvent = this.event.getLeft();
             realEvent.getChannel().sendMessage(replyContent)
                 .queue(m -> success.accept(Pair.of(m, null)));
-        } else if (this.event instanceof SlashCommandInteractionEvent) {
-            SlashCommandInteractionEvent realEvent =
-                (SlashCommandInteractionEvent) this.event;
+        } else {
+            SlashCommandInteractionEvent realEvent = this.event.getRight();
             realEvent.reply(replyContent)
                 .setEphemeral(true) // TODO: make this be parametric
                 .queue(i -> success.accept(Pair.of(null, i))); 
-        } else {
-            throw new NotImplementedError(this.event + " is not being handled by `CommandEnvironment`");
         }
     }
 
@@ -52,18 +50,14 @@ public final class CommandEnvironment {
     public BufferedImage getAttatchedImage() {
         InputStream stream = null;
 
-        if (this.event instanceof MessageReceivedEvent) {
-            MessageReceivedEvent realEvent =
-                (MessageReceivedEvent) this.event;
+        if (this.event.getRight() == null) {
+            MessageReceivedEvent realEvent = this.event.getLeft();
             Message message = realEvent.getMessage();
             stream = getInputStreamFromMessage(message);
-        } else if (this.event instanceof SlashCommandInteractionEvent) {
-            SlashCommandInteractionEvent realEvent =
-                (SlashCommandInteractionEvent) this.event;
+        } else {
+            SlashCommandInteractionEvent realEvent = this.event.getRight();
             Attachment attachment = realEvent.getOption("image").getAsAttachment();
             stream = getInputStreamFromAttatchment(attachment);
-        } else {
-            throw new NotImplementedError(this.event + " is not being handled by `CommandEnvironment`");
         }
 
         return inputStreamToImage(stream);
