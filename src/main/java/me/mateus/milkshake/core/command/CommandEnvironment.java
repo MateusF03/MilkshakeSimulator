@@ -22,6 +22,10 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 public final class CommandEnvironment {
     private Pair<MessageReceivedEvent, SlashCommandInteractionEvent> eventUnion;
     
+    public Pair<MessageReceivedEvent, SlashCommandInteractionEvent> getEventUnion() {
+        return eventUnion;
+    }
+
     public CommandEnvironment(MessageReceivedEvent event) {
         this.eventUnion = Pair.of(event, null);
     }
