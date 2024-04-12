@@ -27,6 +27,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 public final class CommandEnvironment {
+    private final Consumer<Pair<Message, InteractionHook>> DO_NOTHING = p -> {};
+
     private Pair<MessageReceivedEvent, SlashCommandInteractionEvent> eventUnion;
     
     public Pair<MessageReceivedEvent, SlashCommandInteractionEvent> getEventUnion() {
@@ -122,7 +124,7 @@ public final class CommandEnvironment {
     }
 
     public void reply(String replyContent, boolean isInfo) {
-        reply(replyContent, isInfo, null);
+        reply(replyContent, isInfo, DO_NOTHING);
     }
 
     public void reply(String replyContent) {
@@ -158,7 +160,7 @@ public final class CommandEnvironment {
     }
 
     public void embed(MessageEmbed embeddedContent) {
-        embed(embeddedContent, null);
+        embed(embeddedContent, DO_NOTHING);
     }
 
     public static void edit(Pair<Message, InteractionHook> reply, String newReplyContent) throws InvalidAttributeValueException {
