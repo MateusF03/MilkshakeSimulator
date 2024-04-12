@@ -4,6 +4,7 @@ import me.mateus.milkshake.core.command.interfaces.Argument;
 import me.mateus.milkshake.core.command.interfaces.Command;
 import me.mateus.milkshake.core.command.translator.ArgumentTranslator;
 import me.mateus.milkshake.core.utils.Casing;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -50,13 +51,10 @@ public class RegisteredCommand {
 
     public void execute(CommandEnvironment env, ArgumentTranslator argumentTranslator) {
         try {
-            method.invoke(object, env, argumentTranslator);
-        } catch (IllegalArgumentException ignored) {
-            try {
+            if (method.getParameterTypes()[0].equals(CommandEnvironment.class))
+                method.invoke(object, env, argumentTranslator);
+            else
                 method.invoke(object, env.getEventUnion().getLeft(), argumentTranslator);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
