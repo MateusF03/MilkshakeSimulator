@@ -30,7 +30,7 @@ public final class CommandEnvironment {
         this.event = Pair.of(null, event);
     }
 
-    public void reply(String replyContent, @Nullable Consumer<Pair<Message, InteractionHook>> success) {
+    public void reply(String replyContent, boolean isInfo, @Nullable Consumer<Pair<Message, InteractionHook>> success) {
         if (this.event.getRight() == null) {
             MessageReceivedEvent realEvent = this.event.getLeft();
             realEvent.getChannel().sendMessage(replyContent)
@@ -38,13 +38,17 @@ public final class CommandEnvironment {
         } else {
             SlashCommandInteractionEvent realEvent = this.event.getRight();
             realEvent.reply(replyContent)
-                .setEphemeral(true) // TODO: make this be parametric
+                .setEphemeral(isInfo)
                 .queue(i -> success.accept(Pair.of(null, i))); 
         }
     }
 
+    public void reply(String replyContent, boolean isInfo) {
+        reply(replyContent, isInfo, null);
+    }
+
     public void reply(String replyContent) {
-        reply(replyContent, null);
+        reply(replyContent, true);
     }
 
     public BufferedImage getAttatchedImage() {
