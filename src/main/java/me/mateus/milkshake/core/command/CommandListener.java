@@ -10,6 +10,6 @@ public class CommandListener extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot() || !event.isFromGuild())
             return;
-        CommandManager.getInstance().runCommand(event);
+        CommandManager.getInstance().runCommand(new CommandEnvironment(event));
     }
 }

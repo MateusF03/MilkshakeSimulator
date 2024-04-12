@@ -94,30 +94,24 @@ public class CommandManager {
         return prefix;
     }
 
-    public void runCommand(MessageReceivedEvent event) {
-        String messageRaw = event.getMessage().getContentRaw();
-        if (!messageRaw.startsWith(prefix))
-            return;
-        messageRaw = messageRaw.substring(prefix.length());
-        String[] values = messageRaw.split("\\s+");
-        String commandName = values[0];
+    public void runCommand(CommandEnvironment env) {
+        String commandName = env.getCommandName();
 
         RegisteredCommand command = getCommandByName(commandName);
         if (command == null)
             return;
-        User author = event.getAuthor();
-        MessageChannel channel = event.getChannel();
-        if (command.isVipOnly() && !MilkshakeSimulator.VIPS.contains(author.getIdLong())) {
-            channel.sendMessage("**Você não tem permissão de executar este comando**").queue();
+        User caller = env.getCommandCaller();
+        if (command.isVipOnly() && !MilkshakeSimulator.VIPS.contains(caller.getIdLong())) {
+            env.reply("**Você não tem permissão de executar este comando**");
             return;
         }
-        messageRaw = messageRaw.substring(commandName.length());
-        ArgumentTranslator argTranslator = new ArgumentTranslator(messageRaw);
+        String commandBody = env.getCommandBody();
+        ArgumentTranslator argTranslator = new ArgumentTranslator(commandBody);
 
         StringBuilder invalidParameters = new StringBuilder();
         for (Argument argument : command.getArguments()) {
             if (argTranslator.hasNoArgument(argument.name()) && argument.obligatory()) {
-                channel.sendMessage("**Comando invalido:**\n`" + command.getCorrectCommand() + "`").queue();
+                env.reply("**Comando invalido:**\n`" + command.getCorrectCommand() + "`");
                 return;
             }
             if (argTranslator.hasNoArgument(argument.name()))
@@ -129,10 +123,10 @@ public class CommandManager {
         }
         String s = invalidParameters.toString();
         if (!s.isEmpty()) {
-            channel.sendMessage("**Os argumentos a seguir estão errados:**\n`" + s+"`").queue();
+            env.reply("**Os argumentos a seguir estão errados:**\n`" + s+"`");
             return;
         }
-        command.execute(new CommandEnvironment(event), argTranslator);
+        command.execute(env, argTranslator);
     }
 
     private boolean paramsAreValid(Parameter[] params) {

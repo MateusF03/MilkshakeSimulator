@@ -12,11 +12,15 @@ import javax.management.InvalidAttributeValueException;
 
 import org.jetbrains.annotations.Nullable;
 
+import me.mateus.milkshake.core.utils.Casing;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 public final class CommandEnvironment {
@@ -32,6 +36,53 @@ public final class CommandEnvironment {
 
     public CommandEnvironment(SlashCommandInteractionEvent event) {
         this.eventUnion = Pair.of(null, event);
+    }
+
+    public String getCommandName() {
+        if (this.eventUnion.getRight() == null) {
+            MessageReceivedEvent event = this.eventUnion.getLeft();
+            String contentRaw = event.getMessage().getContentRaw();
+            String prefix = CommandManager.getInstance().getPrefix();
+            if (!contentRaw.startsWith(prefix))
+                return null;
+            String contentWithoutPrefix = contentRaw.substring(prefix.length());
+            String[] words = contentWithoutPrefix.split("\\s+");
+            return words[0];
+        } else {
+            SlashCommandInteractionEvent event = this.eventUnion.getRight();
+            return event.getFullCommandName();
+        }
+    }
+
+    public String getCommandBody() {
+        if (this.eventUnion.getRight() == null) {
+            MessageReceivedEvent event = this.eventUnion.getLeft();
+            String contentRaw = event.getMessage().getContentRaw();
+            String[] words = contentRaw.split("\\s+");
+            String body = contentRaw.substring(words[0].length());
+            return body.trim();
+        } else {
+            SlashCommandInteractionEvent event = this.eventUnion.getRight();
+            String body = "";
+            for (OptionMapping optionMapping : event.getOptions()) {
+                if (optionMapping.getType() == OptionType.ATTACHMENT)
+                    continue;
+                String argumentName =
+                    Casing.toCamelCase(Casing.fromSnakeCase(optionMapping.getName()));
+                body += String.format("-%s %s ", argumentName, optionMapping.getAsString());
+            }
+            return body.trim();
+        }
+    }
+
+    public User getCommandCaller() {
+        if (this.eventUnion.getRight() == null) {
+            MessageReceivedEvent event = this.eventUnion.getLeft();
+            return event.getAuthor();
+        } else {
+            SlashCommandInteractionEvent event = this.eventUnion.getRight();
+            return event.getUser();
+        }
     }
 
     public void reply(String replyContent, boolean isInfo, @Nullable Consumer<Pair<Message, InteractionHook>> success) {
