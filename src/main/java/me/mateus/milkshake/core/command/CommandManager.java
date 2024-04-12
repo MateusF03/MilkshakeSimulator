@@ -55,7 +55,8 @@ public class CommandManager {
             commands.add(command);
 
             SlashCommandData slashCommand = command.toSlashCommand();
-            slashCommands.addCommands(slashCommand);
+            if (method.getParameterTypes()[0].equals(CommandEnvironment.class))
+                slashCommands.addCommands(slashCommand);
         }
 
         slashCommands.queue();
