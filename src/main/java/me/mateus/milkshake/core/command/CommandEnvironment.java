@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import me.mateus.milkshake.core.utils.Casing;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -120,6 +121,22 @@ public final class CommandEnvironment {
         }
 
         return inputStreamToImage(stream);
+    }
+
+    public void embed(MessageEmbed embeddedContent, @Nullable Consumer<Pair<Message, InteractionHook>> success) {
+        if (this.eventUnion.getRight() == null) {
+            MessageReceivedEvent event = this.eventUnion.getLeft();
+            event.getChannel().sendMessageEmbeds(embeddedContent)
+                .queue(m -> success.accept(Pair.of(m, null)));
+        } else {
+            SlashCommandInteractionEvent event = this.eventUnion.getRight();
+            event.replyEmbeds(embeddedContent)
+                .queue(i -> success.accept(Pair.of(null, i)));
+        }
+    }
+
+    public void embed(MessageEmbed embeddedContent) {
+        embed(embeddedContent);
     }
 
     public static void edit(Pair<Message, InteractionHook> reply, String newReplyContent) throws InvalidAttributeValueException {
