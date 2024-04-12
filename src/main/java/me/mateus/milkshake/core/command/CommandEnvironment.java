@@ -20,23 +20,23 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 public final class CommandEnvironment {
-    private Pair<MessageReceivedEvent, SlashCommandInteractionEvent> event;
+    private Pair<MessageReceivedEvent, SlashCommandInteractionEvent> eventUnion;
     
     public CommandEnvironment(MessageReceivedEvent event) {
-        this.event = Pair.of(event, null);
+        this.eventUnion = Pair.of(event, null);
     }
 
     public CommandEnvironment(SlashCommandInteractionEvent event) {
-        this.event = Pair.of(null, event);
+        this.eventUnion = Pair.of(null, event);
     }
 
     public void reply(String replyContent, boolean isInfo, @Nullable Consumer<Pair<Message, InteractionHook>> success) {
-        if (this.event.getRight() == null) {
-            MessageReceivedEvent realEvent = this.event.getLeft();
+        if (this.eventUnion.getRight() == null) {
+            MessageReceivedEvent realEvent = this.eventUnion.getLeft();
             realEvent.getChannel().sendMessage(replyContent)
                 .queue(m -> success.accept(Pair.of(m, null)));
         } else {
-            SlashCommandInteractionEvent realEvent = this.event.getRight();
+            SlashCommandInteractionEvent realEvent = this.eventUnion.getRight();
             realEvent.reply(replyContent)
                 .setEphemeral(isInfo)
                 .queue(i -> success.accept(Pair.of(null, i))); 
@@ -54,12 +54,12 @@ public final class CommandEnvironment {
     public BufferedImage getAttatchedImage() {
         InputStream stream = null;
 
-        if (this.event.getRight() == null) {
-            MessageReceivedEvent realEvent = this.event.getLeft();
+        if (this.eventUnion.getRight() == null) {
+            MessageReceivedEvent realEvent = this.eventUnion.getLeft();
             Message message = realEvent.getMessage();
             stream = getInputStreamFromMessage(message);
         } else {
-            SlashCommandInteractionEvent realEvent = this.event.getRight();
+            SlashCommandInteractionEvent realEvent = this.eventUnion.getRight();
             Attachment attachment = realEvent.getOption("image").getAsAttachment();
             stream = getInputStreamFromAttatchment(attachment);
         }
