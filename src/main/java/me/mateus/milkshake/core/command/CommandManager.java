@@ -137,7 +137,9 @@ public class CommandManager {
         Parameter param1 = params[0];
         Parameter param2 = params[1];
         if (!MessageReceivedEvent.class.isAssignableFrom(param1.getType())) {
-            return false;
+            if (!CommandEnvironment.class.isAssignableFrom(param1.getType())) {
+                return false;
+            }
         }
         return ArgumentTranslator.class.isAssignableFrom(param2.getType());
     }
