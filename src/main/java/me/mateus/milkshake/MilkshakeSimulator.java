@@ -63,15 +63,10 @@ public class MilkshakeSimulator {
 
         CommandManager manager = CommandManager.getInstance();
         manager.setupPrefix(dotenv);
-        manager.registerCommands(new SayCommand());
+        manager.registerCommands(jda, new SayCommand());
         MilkshakeManager.getInstance().setupMilkshakes();
-        manager.registerCommands(new GenerateCommand());
-        manager.registerCommands(new CreateCommands());
-        manager.registerCommands(new AdminCommands());
-
-        CommandListUpdateAction slashCommands = jda.updateCommands();
-        for (RegisteredCommand command : manager.getCommands())
-            slashCommands.addCommands(command.toSlashCommand());
-        slashCommands.queue();
+        manager.registerCommands(jda, new GenerateCommand());
+        manager.registerCommands(jda, new CreateCommands());
+        manager.registerCommands(jda, new AdminCommands());
     }
 }

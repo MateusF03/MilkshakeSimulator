@@ -6,9 +6,12 @@ import me.mateus.milkshake.core.command.interfaces.Command;
 import me.mateus.milkshake.core.command.translator.ArgumentTranslator;
 import me.mateus.milkshake.core.milkshake.SourceRegion;
 import me.mateus.milkshake.core.utils.StringComparator;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,9 +38,11 @@ public class CommandManager {
 
     private final List<RegisteredCommand> commands = new ArrayList<>();
 
-    public void registerCommands(Object object) {
+    public void registerCommands(JDA jda, Object object) {
         Class<?> clazz = object.getClass();
         Method[] methods = clazz.getDeclaredMethods();
+        
+        CommandListUpdateAction slashCommands = jda.updateCommands();
 
         for (Method method : methods) {
             Parameter[] params = method.getParameters();
@@ -46,8 +51,14 @@ public class CommandManager {
             Command ann = method.getAnnotation(Command.class);
             if (ann == null)
                 continue;
-            commands.add(new RegisteredCommand(ann, method, object));
+            RegisteredCommand command = new RegisteredCommand(ann, method, object);
+            commands.add(command);
+
+            SlashCommandData slashCommand = command.toSlashCommand();
+            slashCommands.addCommands(slashCommand);
         }
+
+        slashCommands.queue();
     }
 
     public void setPrefix(String prefix) throws IOException {
