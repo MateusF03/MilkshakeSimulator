@@ -73,7 +73,7 @@ public final class CommandEnvironment {
         }
     }
 
-    private BufferedImage inputStreamToImage(InputStream inputStream) {
+    private static BufferedImage inputStreamToImage(InputStream inputStream) {
         try {
             return ImageIO.read(inputStream);
         } catch (IOException | IllegalArgumentException e) {
@@ -82,7 +82,7 @@ public final class CommandEnvironment {
         }
     }
 
-    private InputStream getInputStreamFromAttatchment(Attachment attachment) {
+    private static InputStream getInputStreamFromAttatchment(Attachment attachment) {
         if (!attachment.isImage())
             return null;
 
@@ -94,7 +94,7 @@ public final class CommandEnvironment {
         }
     }
 
-    private InputStream getInputStreamFromMessage(Message message) {
+    private static InputStream getInputStreamFromMessage(Message message) {
         List<Message.Attachment> attachments = message.getAttachments();
         
         if (!attachments.isEmpty())
