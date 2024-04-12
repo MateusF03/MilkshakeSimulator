@@ -54,9 +54,10 @@ public class CommandManager {
             RegisteredCommand command = new RegisteredCommand(ann, method, object);
             commands.add(command);
 
-            SlashCommandData slashCommand = command.toSlashCommand();
-            if (method.getParameterTypes()[0].equals(CommandEnvironment.class))
+            if (method.getParameterTypes()[0].equals(CommandEnvironment.class)) {
+                SlashCommandData slashCommand = command.toSlashCommand();
                 slashCommands.addCommands(slashCommand);
+            }
         }
 
         slashCommands.queue();
