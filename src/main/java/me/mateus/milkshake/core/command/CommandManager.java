@@ -121,7 +121,7 @@ public class CommandManager {
             channel.sendMessage("**Os argumentos a seguir estão errados:**\n`" + s+"`").queue();
             return;
         }
-        command.execute(event, argTranslator);
+        command.execute(new CommandEnvironment(event), argTranslator);
     }
 
     private boolean paramsAreValid(Parameter[] params) {
