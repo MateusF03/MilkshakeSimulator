@@ -13,10 +13,12 @@ import javax.management.InvalidAttributeValueException;
 import org.jetbrains.annotations.Nullable;
 
 import me.mateus.milkshake.core.utils.Casing;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -86,6 +88,26 @@ public final class CommandEnvironment {
         }
     }
 
+    public MessageChannelUnion getCallingChannel() {
+        if (this.eventUnion.getRight() == null) {
+            MessageReceivedEvent event = this.eventUnion.getLeft();
+            return event.getChannel();
+        } else {
+            SlashCommandInteractionEvent event = this.eventUnion.getRight();
+            return event.getChannel();
+        }
+    }
+
+    public JDA getJDAInstance() {
+        if (this.eventUnion.getRight() == null) {
+            MessageReceivedEvent event = this.eventUnion.getLeft();
+            return event.getJDA();
+        } else {
+            SlashCommandInteractionEvent event = this.eventUnion.getRight();
+            return event.getJDA();
+        }
+    }
+
     public void reply(String replyContent, boolean isInfo, @Nullable Consumer<Pair<Message, InteractionHook>> success) {
         if (this.eventUnion.getRight() == null) {
             MessageReceivedEvent event = this.eventUnion.getLeft();
@@ -136,7 +158,7 @@ public final class CommandEnvironment {
     }
 
     public void embed(MessageEmbed embeddedContent) {
-        embed(embeddedContent);
+        embed(embeddedContent, null);
     }
 
     public static void edit(Pair<Message, InteractionHook> reply, String newReplyContent) throws InvalidAttributeValueException {
