@@ -32,12 +32,12 @@ public final class CommandEnvironment {
 
     public void reply(String replyContent, boolean isInfo, @Nullable Consumer<Pair<Message, InteractionHook>> success) {
         if (this.eventUnion.getRight() == null) {
-            MessageReceivedEvent realEvent = this.eventUnion.getLeft();
-            realEvent.getChannel().sendMessage(replyContent)
+            MessageReceivedEvent event = this.eventUnion.getLeft();
+            event.getChannel().sendMessage(replyContent)
                 .queue(m -> success.accept(Pair.of(m, null)));
         } else {
-            SlashCommandInteractionEvent realEvent = this.eventUnion.getRight();
-            realEvent.reply(replyContent)
+            SlashCommandInteractionEvent event = this.eventUnion.getRight();
+            event.reply(replyContent)
                 .setEphemeral(isInfo)
                 .queue(i -> success.accept(Pair.of(null, i))); 
         }
@@ -55,12 +55,12 @@ public final class CommandEnvironment {
         InputStream stream = null;
 
         if (this.eventUnion.getRight() == null) {
-            MessageReceivedEvent realEvent = this.eventUnion.getLeft();
-            Message message = realEvent.getMessage();
+            MessageReceivedEvent event = this.eventUnion.getLeft();
+            Message message = event.getMessage();
             stream = getInputStreamFromMessage(message);
         } else {
-            SlashCommandInteractionEvent realEvent = this.eventUnion.getRight();
-            Attachment attachment = realEvent.getOption("image").getAsAttachment();
+            SlashCommandInteractionEvent event = this.eventUnion.getRight();
+            Attachment attachment = event.getOption("image").getAsAttachment();
             stream = getInputStreamFromAttatchment(attachment);
         }
 
