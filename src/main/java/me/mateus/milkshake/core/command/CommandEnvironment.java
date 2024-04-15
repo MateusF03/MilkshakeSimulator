@@ -147,7 +147,7 @@ public final class CommandEnvironment {
         return inputStreamToImage(stream);
     }
 
-    public void embed(MessageEmbed embeddedContent, @Nullable Consumer<Pair<Message, InteractionHook>> success) {
+    public void embed(MessageEmbed embeddedContent, boolean isInfo, @Nullable Consumer<Pair<Message, InteractionHook>> success) {
         if (this.eventUnion.getRight() == null) {
             MessageReceivedEvent event = this.eventUnion.getLeft();
             event.getChannel().sendMessageEmbeds(embeddedContent)
@@ -155,12 +155,17 @@ public final class CommandEnvironment {
         } else {
             SlashCommandInteractionEvent event = this.eventUnion.getRight();
             event.replyEmbeds(embeddedContent)
+                .setEphemeral(isInfo)
                 .queue(i -> success.accept(Pair.of(null, i)));
         }
     }
 
+    public void embed(MessageEmbed embeddedContent, boolean isInfo) {
+        embed(embeddedContent, isInfo, DO_NOTHING);
+    }
+
     public void embed(MessageEmbed embeddedContent) {
-        embed(embeddedContent, DO_NOTHING);
+        embed(embeddedContent, true);
     }
 
     public static void edit(Pair<Message, InteractionHook> reply, String newReplyContent) throws InvalidAttributeValueException {
