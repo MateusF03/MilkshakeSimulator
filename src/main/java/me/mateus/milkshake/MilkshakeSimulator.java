@@ -67,11 +67,7 @@ public class MilkshakeSimulator {
             e.printStackTrace();
         }
 
-        CommandListUpdateAction slashCommands;
-        if (args.contains("guild-slash-commands"))
-            slashCommands = jda.getGuildById(858724493966573589L).updateCommands();
-        else
-            slashCommands = jda.updateCommands();
+        CommandListUpdateAction slashCommands = jda.updateCommands();
 
         CommandManager manager = CommandManager.getInstance();
         manager.setupPrefix(dotenv);
