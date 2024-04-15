@@ -67,7 +67,8 @@ public class MilkshakeSimulator {
             e.printStackTrace();
         }
 
-        CommandListUpdateAction slashCommands = jda.updateCommands();
+        // FIXME: Remove `getGuildById(...)` portion when sending for review
+        CommandListUpdateAction slashCommands = jda.getGuildById(858724493966573589L).updateCommands();
 
         CommandManager manager = CommandManager.getInstance();
         manager.setupPrefix(dotenv);
