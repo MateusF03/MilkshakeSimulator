@@ -12,5 +12,6 @@ public @interface Command {
     String name();
     String description();
     boolean vipOnly() default false;
+    boolean receivesImage() default false;
     Argument[] args() default {};
 }

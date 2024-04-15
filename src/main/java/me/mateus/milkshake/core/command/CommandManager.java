@@ -6,15 +6,17 @@ import me.mateus.milkshake.core.command.interfaces.Command;
 import me.mateus.milkshake.core.command.translator.ArgumentTranslator;
 import me.mateus.milkshake.core.milkshake.SourceRegion;
 import me.mateus.milkshake.core.utils.StringComparator;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,7 @@ public class CommandManager {
 
     private final List<RegisteredCommand> commands = new ArrayList<>();
 
-    public void registerCommands(Object object) {
+    public void registerCommands(CommandListUpdateAction slashCommands, Object object) {
         Class<?> clazz = object.getClass();
         Method[] methods = clazz.getDeclaredMethods();
 
@@ -47,7 +49,13 @@ public class CommandManager {
             Command ann = method.getAnnotation(Command.class);
             if (ann == null)
                 continue;
-            commands.add(new RegisteredCommand(ann, method, object));
+            RegisteredCommand command = new RegisteredCommand(ann, method, object);
+            commands.add(command);
+
+            if (method.getParameterTypes()[0].equals(CommandEnvironment.class)) {
+                SlashCommandData slashCommand = command.toSlashCommand();
+                slashCommands.addCommands(slashCommand);
+            }
         }
     }
 
@@ -84,30 +92,24 @@ public class CommandManager {
         return prefix;
     }
 
-    public void runCommand(MessageReceivedEvent event) {
-        String messageRaw = event.getMessage().getContentRaw();
-        if (!messageRaw.startsWith(prefix))
-            return;
-        messageRaw = messageRaw.substring(prefix.length());
-        String[] values = messageRaw.split("\\s+");
-        String commandName = values[0];
+    public void runCommand(CommandEnvironment env) {
+        String commandName = env.getCommandName();
 
         RegisteredCommand command = getCommandByName(commandName);
         if (command == null)
             return;
-        User author = event.getAuthor();
-        MessageChannel channel = event.getChannel();
-        if (command.isVipOnly() && !MilkshakeSimulator.VIPS.contains(author.getIdLong())) {
-            channel.sendMessage("**Você não tem permissão de executar este comando**").queue();
+        User caller = env.getCommandCaller();
+        if (command.isVipOnly() && !MilkshakeSimulator.VIPS.contains(caller.getIdLong())) {
+            env.reply("**Você não tem permissão de executar este comando**");
             return;
         }
-        messageRaw = messageRaw.substring(commandName.length());
-        ArgumentTranslator argTranslator = new ArgumentTranslator(messageRaw);
+        String commandBody = env.getCommandBody();
+        ArgumentTranslator argTranslator = new ArgumentTranslator(commandBody);
 
         StringBuilder invalidParameters = new StringBuilder();
         for (Argument argument : command.getArguments()) {
             if (argTranslator.hasNoArgument(argument.name()) && argument.obligatory()) {
-                channel.sendMessage("**Comando invalido:**\n`" + command.getCorrectCommand() + "`").queue();
+                env.reply("**Comando invalido:**\n`" + command.getCorrectCommand() + "`");
                 return;
             }
             if (argTranslator.hasNoArgument(argument.name()))
@@ -119,10 +121,10 @@ public class CommandManager {
         }
         String s = invalidParameters.toString();
         if (!s.isEmpty()) {
-            channel.sendMessage("**Os argumentos a seguir estão errados:**\n`" + s+"`").queue();
+            env.reply("**Os argumentos a seguir estão errados:**\n`" + s+"`");
             return;
         }
-        command.execute(event, argTranslator);
+        command.execute(env, argTranslator);
     }
 
     private boolean paramsAreValid(Parameter[] params) {
@@ -131,7 +133,9 @@ public class CommandManager {
         Parameter param1 = params[0];
         Parameter param2 = params[1];
         if (!MessageReceivedEvent.class.isAssignableFrom(param1.getType())) {
-            return false;
+            if (!CommandEnvironment.class.isAssignableFrom(param1.getType())) {
+                return false;
+            }
         }
         return ArgumentTranslator.class.isAssignableFrom(param2.getType());
     }

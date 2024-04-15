@@ -6,10 +6,13 @@ import me.mateus.milkshake.commands.GenerateCommand;
 import me.mateus.milkshake.commands.SayCommand;
 import me.mateus.milkshake.core.command.CommandListener;
 import me.mateus.milkshake.core.command.CommandManager;
+import me.mateus.milkshake.core.command.RegisteredCommand;
 import me.mateus.milkshake.core.milkshake.MilkshakeManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +21,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
@@ -55,16 +56,28 @@ public class MilkshakeSimulator {
             lines.forEach(l -> VIPS.add(Long.parseLong(l)));
         }
 
-        CommandManager manager = CommandManager.getInstance();
-        manager.setupPrefix(dotenv);
-        manager.registerCommands(new SayCommand());
-        MilkshakeManager.getInstance().setupMilkshakes();
-        manager.registerCommands(new GenerateCommand());
-        manager.registerCommands(new CreateCommands());
-        manager.registerCommands(new AdminCommands());
         JDA jda = JDABuilder.createDefault(token)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
                 .addEventListeners(new CommandListener())
                 .build();
+
+        try {
+            jda.awaitReady();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // FIXME: Remove `getGuildById(...)` portion when sending for review
+        CommandListUpdateAction slashCommands = jda.getGuildById(858724493966573589L).updateCommands();
+
+        CommandManager manager = CommandManager.getInstance();
+        manager.setupPrefix(dotenv);
+        manager.registerCommands(slashCommands, new SayCommand());
+        MilkshakeManager.getInstance().setupMilkshakes();
+        manager.registerCommands(slashCommands, new GenerateCommand());
+        manager.registerCommands(slashCommands, new CreateCommands());
+        manager.registerCommands(slashCommands, new AdminCommands());
+
+        slashCommands.queue();
     }
 }
