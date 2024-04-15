@@ -38,11 +38,9 @@ public class CommandManager {
 
     private final List<RegisteredCommand> commands = new ArrayList<>();
 
-    public void registerCommands(JDA jda, Object object) {
+    public void registerCommands(CommandListUpdateAction slashCommands, Object object) {
         Class<?> clazz = object.getClass();
         Method[] methods = clazz.getDeclaredMethods();
-        
-        CommandListUpdateAction slashCommands = jda.updateCommands();
 
         for (Method method : methods) {
             Parameter[] params = method.getParameters();
@@ -59,8 +57,6 @@ public class CommandManager {
                 slashCommands.addCommands(slashCommand);
             }
         }
-
-        slashCommands.queue();
     }
 
     public void setPrefix(String prefix) throws IOException {
