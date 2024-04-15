@@ -35,7 +35,9 @@ public class MilkshakeSimulator {
     public static final Set<Long> VIPS = new HashSet<>();
     public static boolean running = true;
 
-    public static void main(String[] args) throws IOException, LoginException {
+    public static void main(String[] argsArray) throws IOException, LoginException {
+        List<String> args = Arrays.asList(argsArray);
+
         Path of = Path.of(".env");
         if (!Files.exists(of))
             Files.createFile(of);
