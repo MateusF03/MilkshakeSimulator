@@ -61,6 +61,12 @@ public class MilkshakeSimulator {
                 .addEventListeners(new CommandListener())
                 .build();
 
+        try {
+            jda.awaitReady();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         CommandManager manager = CommandManager.getInstance();
         manager.setupPrefix(dotenv);
         manager.registerCommands(jda, new SayCommand());
